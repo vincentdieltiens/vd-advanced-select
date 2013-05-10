@@ -1,0 +1,30 @@
+<!doctype>
+<html ng-app="app">
+	<head>
+		<title>AngularJS Advanced Select</title>
+		<link rel="stylesheet" type="text/css" href="../css/advanced_select.css" />
+		<link rel="stylesheet" type="text/css" href="index.css" />
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>	
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.6/angular.min.js"></script>
+		<script type="text/javascript" src="../advanced_select.js"></script>
+		<script type="text/javascript" src="index.js"></script>
+	</head>
+	<body ng-controller="index">
+		<div>
+		Initial Select :
+		<select ng-model="language" 
+		        ng-options="language.id as language.name for language in languages"
+		        class="languages">
+		</select>
+		</div>
+
+		<div>
+		Advanced Select : 
+		<select ng-model="language" 
+		        ng-options="language.id as language.name for language in languages"
+		        class="languages"
+		        advanced-select="">
+		</select>
+		</div>
+	</body>
+</html>
