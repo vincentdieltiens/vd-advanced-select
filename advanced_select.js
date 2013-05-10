@@ -29,9 +29,9 @@ angular.module('vd.directive.advanced_select', [])
 				if (attrs.ngOptions) {
 					var match = attrs.ngOptions.match(NG_OPTIONS_REGEXP),
 						item = match[4] || match[6];
-						label = (match[2] || match[1]).replace(item+'.', '');
-						labelFn = $parse(match[2] || match[1]);
-						compareWith = match[2] ? match[1].replace(item+'.', '') : null;
+						label = (match[2] || match[1]).replace(new RegExp(item+'\.?'), '');
+						labelFn = $parse(label);
+						compareWith = match[2] ? match[1].replace(new RegExp(item+'\.?'), '') : null;
 						options = match[7];
 						console.log('item : ', item)
 						console.log('label : ', label)
@@ -41,9 +41,10 @@ angular.module('vd.directive.advanced_select', [])
 					fillInResultsFromSelect(scope, select);
 				}
 
-				
 				// Creates the fake select
 				var fakeSelect = createFakeSelect();
+
+				scope.labelFn = labelFn;
 
 				scope.$watch('dropDownOpen', function() {
 					if (scope.dropDownOpen) {
@@ -100,7 +101,7 @@ angular.module('vd.directive.advanced_select', [])
 
 				function fillInResultsFromNgOptions() {
 					scope.$watch(options, function(items) {
-						console.log('items : ', items)
+						//console.log('items : ', items)
 						scope.results = items;
 					}, true);
 				}
@@ -118,7 +119,7 @@ angular.module('vd.directive.advanced_select', [])
 					if (compareWith) {
 						var A = $parse(compareWith)(a);
 						var B = $parse(compareWith)(b);
-						console.log(A, 'vs', B)
+						//console.log(A, 'vs', B)
 						return A == B;
 					} else {
 						return angular.equals(a, b);
@@ -129,7 +130,7 @@ angular.module('vd.directive.advanced_select', [])
 					var fakeSelect = angular.element(
 						'<div class="advanced-select-container" ng-class="{ \'advanced-select-dropdown-open\': dropDownOpen }">' +
 							'<a href="javascript:void(0)" ng-click="dropDownOpen=!dropDownOpen" class="advanced-select-choice">' +
-								'<span ng-bind="selected.'+label+'"></span>' +
+								'<span ng-bind="labelFn(selected)"></span>' +
 								'<abbr class="advanced-select-search-choice-close" style="display: none;"></abbr>' +
 								'<div class="arrow"><b></b></div>' +
 							'</a>' +
@@ -139,7 +140,7 @@ angular.module('vd.directive.advanced_select', [])
 									'</div>' +
 									'<ul class="advanced-select-results">' +
 										'<li class="advanced-select-result advanced-select-result-selectable" ng-repeat="'+item+' in results | filter:search" ng-click="select('+item+')" ng-class="{ \'advanced-select-highlighted\': compare(selected, '+item+') }">'+
-											'<div class="advanced-select-result-label" ng-bind="'+item+'.'+label+'"></div>' +
+											'<div class="advanced-select-result-label" ng-bind="labelFn('+item+')"></div>' +
 										'</li>' +
 									'</ul>' +
 								'</div>' +
