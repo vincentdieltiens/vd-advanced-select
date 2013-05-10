@@ -18,20 +18,26 @@ angular.module('vd.directive.advanced_select', [])
 					models = null,
 					body = angular.element(document.querySelector('body'));
 
+				var getNgModel = $parse(attrs.ngModel);
+				var setNgModel = getNgModel.assign;
+
 				if (attrs.ngOptions) {
 					var match = attrs.ngOptions.match(NG_OPTIONS_REGEXP),
-						//displayFn = $parse(match[2] || match[1]),
-            			//valueName = match[4] || match[6],
-            			//keyName = match[5],
-            			//groupByFn = $parse(match[3] || ''),
-            			//voidalueFn = $parse(match[2] ? match[1] : valueName),
-            			label = match[2] || match[1];
+						label = match[2] || match[1];
             			item = match[4] || match[6];
             			models = match[7];
 					updateResultsFromNgOptions();
 				} else {
 					updateResultsFromSelect();
-				} 
+				}
+
+				var label_property = label.replace(item+'.', '');
+
+				scope.select = function(item) {
+					console.log('select()');
+					scope.dropDownOpen = false;
+					setNgModel(scope, item);
+				}
 
 				var fakeSelect = createFakeSelect();
 				var fakeSelectChoice = fakeSelect.children('.advanced-select-choice');
@@ -96,7 +102,7 @@ angular.module('vd.directive.advanced_select', [])
 					var fakeSelect = angular.element(
 						'<div class="advanced-select-container" ng-class="{ \'advanced-select-dropdown-open\': dropDownOpen }">' +
 							'<a href="javascript:void(0)" ng-click="dropDownOpen=!dropDownOpen" class="advanced-select-choice">' +
-								'<span>ddeede</span>' +
+								'<span ng-bind="'+attrs.ngModel+'.'+label_property+'"></span>' +
 								'<abbr class="advanced-select-search-choice-close" style="display: none;"></abbr>' +
 								'<div class="arrow"><b></b></div>' +
 							'</a>' +
@@ -105,7 +111,7 @@ angular.module('vd.directive.advanced_select', [])
 										'<input type="text" ng-model="search" autocomplete="off" class="advanced-select-input" tabindex="-1" />' +
 									'</div>' +
 									'<ul class="advanced-select-results">' +
-										'<li class="advanced-select-result advanced-select-result-selectable" ng-repeat="'+item+' in results | filter:search">'+
+										'<li class="advanced-select-result advanced-select-result-selectable" ng-repeat="'+item+' in results | filter:search" ng-click="select('+item+')">'+
 											'<div class="advanced-select-result-label" ng-bind="'+label+'"></div>' +
 										'</li>' +
 									'</ul>' +

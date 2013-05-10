@@ -182,6 +182,60 @@
 				background: url('../images/advanced-select.png') no-repeat 100% -22px, linear-gradient(top, #ffffff 85%, #eeeeee 99%);
 			}
 		}
+
+		.advanced-select-results {
+			max-height: 200px;
+			padding: 0 0 0 4px;
+			margin: 4px 4px 4px 0;
+			position: relative;
+			overflow-x: hidden;
+			overflow-y: auto;
+
+			ul.advanced-select-result-sub {
+				margin: 0;
+				& > li .advanced-select-result-label { 
+					padding-left: 20px;
+					& > li .advanced-select-result-label {
+						padding-left: 40px;
+						& > li .advanced-select-result-label {
+							padding-left: 60px;
+							& > li .advanced-select-result-label {
+								padding-left: 80px;
+							}
+						}
+					}
+				}
+			}
+
+			li {
+				list-style: none;
+				display: list-item;
+
+				&.advanced-select-result-with-children > .advanced-select-result-label {
+					font-weight: bold;
+				}
+
+				em {
+					background: #feffde;
+					font-style: normal;
+				}
+
+				&:hover, &.advanced-select-highlighted {
+					background: #3875d7;
+					color: #fff;
+
+					em {
+						background: transparent;
+					}
+				}
+			}
+
+			.advanced-select-result-label {
+				padding: 3px 7px 4px;
+				margin: 0;
+				cursor: pointer;
+			}
+		}
 	}
 
 	&.advanced-select-dropdown-open {
