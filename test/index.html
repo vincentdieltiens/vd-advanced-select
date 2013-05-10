@@ -12,20 +12,39 @@
 	</head>
 	<body ng-controller="index">
 		<div>
-		<label for="languages2cal">Initial Select :</label>
-		<select ng-model="language" 
-		        ng-options="language.id as language.name for language in languages"
-		        class="languages">
-		</select>
+			<label for="languages0">Initial Select :</label>
+			<select id="languages0" ng-model="language.id" 
+			        ng-options="language.id as language.name for language in languages"
+			        class="languages">
+			</select>
 		</div>
-
 		<div>
-		<label for="languages1">Advanced Select : </label>
-		<select id="languages1" ng-model="language" 
+			<label for="languages1">Advanced Select : </label>
+			<select id="languages1" ng-model="language.id" 
 		        ng-options="language.id as language.name for language in languages"
 		        class="languages"
 		        advanced-select="">
-		</select>
+			</select>
+		</div>
+
+		<hr />
+		
+		<div>
+			<label for="numbers">Initial Select :</label>
+			<select id="numbers" 
+			        ng-model="number" 
+			        ng-options="number for number in numbers"
+			        class="numbers">
+			</select>
+		</div>
+		<div>
+			<label for="numbers1">Advanced Select : </label>
+			<select id="numbers1"
+			        ng-model="number" 
+			        ng-options="number for number in numbers"
+			        class="numbers"
+		        advanced-select="">
+			</select>
 		</div>
 	</body>
 </html>

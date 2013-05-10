@@ -1,10 +1,9 @@
 angular.module('app', ['vd.directive.advanced_select'])
 	.controller('index', function($scope) {
-		$scope.language = null;
-		$scope.$watch('language', function() {
-			console.log('language changed : ', $scope.language);
+		$scope.language = { id: null };
+		$scope.$watch('language.id', function() {
+			console.log('language id changed : ', $scope.language.id);
 		});
-
 		$scope.languages = [{
 			id: 0,
 			name: 'English'
@@ -15,4 +14,11 @@ angular.module('app', ['vd.directive.advanced_select'])
 			id: 2,
 			name: 'Italiano'
 		}];
+
+		$scope.number = 0;
+		$scope.$watch('number', function() {
+			console.log('number change : ', $scope.number);
+		});
+		$scope.numbers = [5, 10, 15, 20, 25, 30];
+		
 	});
