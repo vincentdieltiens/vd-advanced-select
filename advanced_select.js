@@ -72,8 +72,7 @@ angular.module('vd.directive.advanced_select', [])
 					scope.selected = item;
 					scope.highlight(item);
 
-					// Hide the options
-					scope.dropDownOpen = false;
+					
 
 					// Update the model
 					if (angular.isUndefined(updateModel) || updateModel) {
@@ -87,6 +86,9 @@ angular.module('vd.directive.advanced_select', [])
 					if (angular.isDefined(focus) && focus) {
 						fakeSelect.find('a').focus();
 					}
+
+					// Hide the options
+					scope.dropDownOpen = false;
 				}
 
 				scope.highlight = function(item) {
@@ -157,8 +159,11 @@ angular.module('vd.directive.advanced_select', [])
 					switch(e.keyCode) {
 						case 9: // Tab
 						case 13: // Enter
+							e.preventDefault();
+							e.stopPropagation();
 							scope.select(scope.highlighted, true, true);
 							scope.$apply();
+
 							break;
 						case 27: // Escape
 							scope.dropDownOpen = false;
@@ -215,9 +220,10 @@ angular.module('vd.directive.advanced_select', [])
 				}
 
 				function createFakeSelect() {
+					var tabIndex = select.attr('tabindex') ? select.attr('tabindex') : '';
 					var fakeSelect = angular.element(
 						'<div class="advanced-select-container" ng-class="{ \'advanced-select-dropdown-open\': dropDownOpen }">' +
-							'<a href="javascript:void(0)" ng-click="dropDownOpen=!dropDownOpen" class="advanced-select-choice">' +
+							'<a href="javascript:void(0)" ng-click="dropDownOpen=!dropDownOpen" class="advanced-select-choice" tabindex="'+tabIndex+'">' +
 								'<span ng-bind="selected.target'+label+'"></span>' +
 								'<abbr class="advanced-select-search-choice-close" style="display: none;"></abbr>' +
 								'<div class="arrow"><b></b></div>' +
@@ -236,7 +242,7 @@ angular.module('vd.directive.advanced_select', [])
 					
 					
 					fakeSelect.addClass(select.attr('class'));
-
+					
 					select.after(fakeSelect);
 					select.css('display', 'none');
 
