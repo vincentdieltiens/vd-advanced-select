@@ -59,6 +59,10 @@ angular.module('vd.directive.advanced_select', [])
 				});
 
 				scope.$watch(attrs.ngModel, function(ngModel) {
+					scope.updateModel(ngModel);
+				}, true);
+
+				scope.updateModel = function(ngModel) {
 					var results = $filter('filter')(scope.results, scope.search);
 					angular.forEach(results, function(r) {
 						if ((scope.compareWith && $parse(scope.compareWith)(r.target) == ngModel) || r.target == ngModel) {
@@ -66,7 +70,7 @@ angular.module('vd.directive.advanced_select', [])
 							scope.select(r, false, false);
 						}
 					});
-				});
+				}
 
 				scope.select = function(item, updateModel, focus) {
 					scope.selected = item;
@@ -197,6 +201,7 @@ angular.module('vd.directive.advanced_select', [])
 								target: item
 							});
 						});
+						scope.updateModel(getNgModel(scope));
 					}, true);
 				}
 

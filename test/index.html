@@ -11,6 +11,9 @@
 		<script type="text/javascript" src="index.js"></script>
 	</head>
 	<body ng-controller="index">
+		<h1>Some Examples...</h1>
+
+		<h2>Simple list of objetcts</h2>
 		<div>
 			<label for="languages0">Initial Select :</label>
 			<select id="languages0" ng-model="language.id" 
@@ -30,6 +33,7 @@
 
 		<hr />
 		
+		<h2>Simple list of primitives</h2>
 		<div>
 			<label for="numbers">Initial Select :</label>
 			<select id="numbers" 
@@ -48,5 +52,49 @@
 			</select>
 		</div>
 		<button class="triggerChangeWithjQuery" data-target-id="numbers">Change with jQuery</button>
+
+		<hr />
+		
+		<h2>List of remote objects (loaded in 3 seconds)</h2>
+		<div>
+			<label for="countries">Initial Select :</label>
+			<select id="countries" 
+			        ng-model="country.id" 
+			        ng-options="country.id as country.name for country in countries"
+			        class="countries">
+			</select>
+		</div>
+		<div>
+			<label for="countries1">Advanced Select : </label>
+			<select id="countries1"
+			        ng-model="country.id" 
+			        ng-options="country.id as country.name for country in countries"
+			        class="countries"
+		        advanced-select="">
+			</select>
+		</div>
+		<button class="triggerChangeWithjQuery" data-target-id="countries1">Change with jQuery</button>
+
+		<hr />
+
+		<h2>List of remote objects (loaded in 3 seconds) with default</h2>
+		<div>
+			<label for="countries2">Initial Select :</label>
+			<select id="countries2" 
+			        ng-model="country2.id" 
+			        ng-options="country.id as country.name for country in countries"
+			        class="countries">
+			</select>
+		</div>
+		<div>
+			<label for="countries3">Advanced Select : </label>
+			<select id="countries3"
+			        ng-model="country2.id" 
+			        ng-options="country.id as country.name for country in countries"
+			        class="countries"
+		        advanced-select="">
+			</select>
+		</div>
+		<button class="triggerChangeWithjQuery" data-target-id="countries3">Change with jQuery</button>
 	</body>
 </html>
