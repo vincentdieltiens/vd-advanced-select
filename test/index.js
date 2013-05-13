@@ -22,3 +22,9 @@ angular.module('app', ['vd.directive.advanced_select'])
 		$scope.numbers = [5, 10, 15, 20, 25, 30];
 		
 	});
+
+$(document).ready(function() {
+	$('.triggerChangeWithjQuery').click(function() {
+		$('#'+$(this).get(0).dataset.targetId).val(2).trigger('change');
+	});
+});
