@@ -16,26 +16,23 @@ angular.module('vd.directive.advanced_select', [])
 			link: function(scope, select, attrs, ngModelController) {
 				var label = "label",
 					item = "item",
-					compareWith = null;
 					options = null,
-					objects = [],
-					labelFn = $parse(label);
+					objects = [];
+
+				scope.compareWith = null;
 
 				// ngModel
 				var getNgModel = $parse(attrs.ngModel);
 				var setNgModel = getNgModel.assign;
+				var setNgModelAttr = attrs.ngModel;
 
 				// Fill in the options of the fake select
 				if (attrs.ngOptions) {
 					var match = attrs.ngOptions.match(NG_OPTIONS_REGEXP),
 						item = match[4] || match[6];
-						label = (match[2] || match[1]).replace(new RegExp(item+'\.?'), '');
-						labelFn = $parse(label);
-						compareWith = match[2] ? match[1].replace(new RegExp(item+'\.?'), '') : null;
+						label = (match[2] || match[1]).replace(new RegExp(item), '');
+						scope.compareWith = match[2] ? match[1].replace(new RegExp(item+'\.?'), '') : null;
 						options = match[7];
-						console.log('item : ', item)
-						console.log('label : ', label)
-						console.log('compareWith : ', compareWith);
 					fillInResultsFromNgOptions(scope, options);
 				} else {
 					fillInResultsFromSelect(scope, select);
@@ -43,8 +40,6 @@ angular.module('vd.directive.advanced_select', [])
 
 				// Creates the fake select
 				var fakeSelect = createFakeSelect();
-
-				scope.labelFn = labelFn;
 
 				scope.$watch('dropDownOpen', function() {
 					if (scope.dropDownOpen) {
@@ -63,7 +58,7 @@ angular.module('vd.directive.advanced_select', [])
 
 				scope.$watch(attrs.ngModel, function(ngModel) {
 					angular.forEach(scope.results, function(r) {
-						if ($parse(compareWith)(r) == ngModel) {
+						if ((scope.compareWith && $parse(scope.compareWith)(r) == ngModel) || r == ngModel) {
 							scope.selected = r;
 						}
 					});
@@ -74,7 +69,12 @@ angular.module('vd.directive.advanced_select', [])
 					scope.dropDownOpen = false;
 					scope.selected = item;
 					// Update the model
-					setNgModel(scope, $parse(compareWith)(item));
+					if (scope.compareWith) {
+						setNgModel(scope, $parse(scope.compareWith)(item));
+					} else {
+						setNgModel(scope, item);
+					}
+					
 				}
 
 				function handleKeys(e) {
@@ -101,7 +101,6 @@ angular.module('vd.directive.advanced_select', [])
 
 				function fillInResultsFromNgOptions() {
 					scope.$watch(options, function(items) {
-						//console.log('items : ', items)
 						scope.results = items;
 					}, true);
 				}
@@ -116,10 +115,9 @@ angular.module('vd.directive.advanced_select', [])
 				}
 
 				scope.compare = function(a, b) {
-					if (compareWith) {
-						var A = $parse(compareWith)(a);
-						var B = $parse(compareWith)(b);
-						//console.log(A, 'vs', B)
+					if (scope.compareWith) {
+						var A = $parse(scope.compareWith)(a);
+						var B = $parse(scope.compareWith)(b);
 						return A == B;
 					} else {
 						return angular.equals(a, b);
@@ -130,7 +128,7 @@ angular.module('vd.directive.advanced_select', [])
 					var fakeSelect = angular.element(
 						'<div class="advanced-select-container" ng-class="{ \'advanced-select-dropdown-open\': dropDownOpen }">' +
 							'<a href="javascript:void(0)" ng-click="dropDownOpen=!dropDownOpen" class="advanced-select-choice">' +
-								'<span ng-bind="labelFn(selected)"></span>' +
+								'<span ng-bind="selected'+label+'"></span>' +
 								'<abbr class="advanced-select-search-choice-close" style="display: none;"></abbr>' +
 								'<div class="arrow"><b></b></div>' +
 							'</a>' +
@@ -140,11 +138,12 @@ angular.module('vd.directive.advanced_select', [])
 									'</div>' +
 									'<ul class="advanced-select-results">' +
 										'<li class="advanced-select-result advanced-select-result-selectable" ng-repeat="'+item+' in results | filter:search" ng-click="select('+item+')" ng-class="{ \'advanced-select-highlighted\': compare(selected, '+item+') }">'+
-											'<div class="advanced-select-result-label" ng-bind="labelFn('+item+')"></div>' +
+											'<div class="advanced-select-result-label" ng-bind="'+item+label+'"></div>' +
 										'</li>' +
 									'</ul>' +
 								'</div>' +
 						'</div>');
+					
 					
 					fakeSelect.addClass(select.attr('class'));
 
