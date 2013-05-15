@@ -69,6 +69,7 @@ angular.module('app', ['vd.directive.advanced_select'])
 		}];
 		$scope.language2 = { id: null };
 
+		$scope.language3 = { id: null };
 	});
 
 $(document).ready(function() {

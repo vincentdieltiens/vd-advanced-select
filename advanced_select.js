@@ -41,13 +41,18 @@ angular.module('vd.directive.advanced_select', [])
 					scope.dropDownOpen = false;
 				};
 
-				scope.updateSelection = function(ngModel) {
-					var results = $filter('filter')(scope.options, scope.search);
-					angular.forEach(results, function(r) {
+				scope.updateSelection = function(ngModel, results) {
+					var results = angular.isDefined(results) ? results : $filter('filter')(scope.options, scope.search);
+					for(var i=0, n = results.length; i < n; i++) {
+						var r = results[i];
 						if ((self.compareWith && $parse(self.compareWith)(r.target) == ngModel) || r.target == ngModel) {
 							scope.select(r, false, false);
+							return;
 						}
-					});
+						if (r.children) {
+							scope.updateSelection(ngModel, r.children);
+						}
+					}
 				};
 			},
 			dropDownOpened: function() {
@@ -55,8 +60,8 @@ angular.module('vd.directive.advanced_select', [])
 			},
 			createFakeSelect: function() {
 				var tabIndex = this.select.attr('tabindex') ? this.select.attr('tabindex') : '';
-				var fakeSelect = angular.element('<div class="advanced-select-container" ng-class="{ \'advanced-select-dropdown-open\': dropDownOpen }">' + 
-					'<a href="javascript:void(0)" ng-click="dropDownOpen=!dropDownOpen" class="advanced-select-choice" tabindex="' + tabIndex + '">' + 
+				var fakeSelect = angular.element('<div class="advanced-select-container" ng-class="{ \'advanced-select-dropdown-open\': dropDownOpen, \'disabled\': disabled }">' + 
+					'<a href="javascript:void(0)" ng-click="dropDownOpen=(!disabled && !dropDownOpen)" class="advanced-select-choice" tabindex="' + tabIndex + '">' + 
 						'<span ng-bind="selected.label"></span>' + 
 						'<abbr class="advanced-select-search-choice-close" style="display: none;"></abbr>' + 
 						'<div class="arrow"><b></b></div>' + 
@@ -92,6 +97,7 @@ angular.module('vd.directive.advanced_select', [])
 				$scope.dropDownOpen = false;
 				$scope.highlighted = null;
 				$scope.search = '';
+				$scope.disabled = false;
 
 				$scope.highlight = function(item) {
 					if ($scope.highlighted) {
@@ -211,13 +217,14 @@ angular.module('vd.directive.advanced_select', [])
 
 				if (attrs.ngOptions) {
 					var match = attrs.ngOptions.match(NG_OPTIONS_REGEXP),
-					item = match[4] || match[6];
-					label = (match[2] || match[1]).replace(new RegExp(item), '');
-					labelFn = $parse(label.replace(new RegExp('^\.'), '') || '');
-					compareWith = match[2] ? match[1].replace(new RegExp(item + '\.?'), '') : null;
-					groupBy = match[3],
-				    groupByFn = $parse((match[3] || '').replace(new RegExp(item + '\.?'), '') || ''),
-					optionsModel = match[7];
+					    item = match[4] || match[6],
+					    label = (match[2] || match[1]).replace(new RegExp(item), ''),
+					    labelExp = label.replace(new RegExp('^\.'), ''),
+					    labelFn = labelExp ? $parse(labelExp) : function(s, value) { return value },
+					    compareWith = match[2] ? match[1].replace(new RegExp(item + '\.?'), '') : null,
+					    groupBy = match[3] ? match[3].replace(new RegExp(item + '\.?'), '') : null,
+					    groupByFn = $parse((match[3] || '').replace(new RegExp(item + '\.?'), '')),
+					    optionsModel = match[7];
 					fillInResultsFromNgOptions();
 				} else {
 					fillInResultsFromSelect();
@@ -246,7 +253,12 @@ angular.module('vd.directive.advanced_select', [])
 					}
 				});
 
+				attrs.$observe('disabled', function(disabled) {
+					scope.disabled = disabled;
+				});
+
 				scope.$watch(attrs.ngModel, function(ngModel) {
+					console.log(attrs.id, ':', ngModel)
 					scope.updateSelection(ngModel);
 				}, true);
 
@@ -290,8 +302,6 @@ angular.module('vd.directive.advanced_select', [])
 				 */
 				function fillInResultsFromNgOptions() {
 					scope.$watch(optionsModel, function(items) {
-						
-
 						if (groupBy != null) {
 							scope.options = [];
 							var groups = {};
@@ -301,7 +311,7 @@ angular.module('vd.directive.advanced_select', [])
 								if (!angular.isDefined(groups[groupByName])) {
 									groups[groupByName] = [];
 								}
-								groups[groupByName].push({ target: item, label: labelFn(item) });
+								groups[groupByName].push({ target: item, label: labelFn(scope, item) });
 							});
 
 							angular.forEach(groups, function(subitems, groupName) {
@@ -317,7 +327,7 @@ angular.module('vd.directive.advanced_select', [])
 							angular.forEach(items, function(item) {
 								scope.options.push({
 									target: item,
-									label: labelFn(item)
+									label: labelFn(scope, item)
 								});
 							});
 							scope.updateSelection(getNgModel(scope));

@@ -103,7 +103,7 @@
 		<div>
 			<label for="languages2">Initial Select :</label>
 			<select id="languages2" 
-			        ng-model="language2.id" 
+			        ng-model="language3.id" 
 			        ng-options="language.id as language.name group by language.group for language in hierachical_languages"
 			        class="languages">
 			</select>
@@ -111,12 +111,36 @@
 		<div>
 			<label for="languages3">Advanced Select : </label>
 			<select id="languages3"
-			        ng-model="language2.id" 
+			        ng-model="language3.id" 
 			        ng-options="language.id as language.name group by language.group for language in hierachical_languages"
 			        class="languages"
 		        advanced-select="">
 			</select>
 		</div>
-		<button class="triggerChangeWithjQuery" data-target-id="countries3">Change with jQuery</button>
+		<button class="triggerChangeWithjQuery" data-target-id="languages3">Change with jQuery</button>
+
+		<hr />
+
+		<h2>Simple <b>disabled</b> list of objetcts</h2>
+		<div>
+			<label for="languages4">Initial Select :</label>
+			<select id="languages4" ng-model="language3.id" 
+			        ng-options="language.id as language.name for language in languages"
+			        disabled="disabled"
+			        class="languages">
+			</select>
+		</div>
+		<div>
+			<label for="languages5">Advanced Select : </label>
+			<select id="languages5" ng-model="language3.id" 
+		        ng-options="language.id as language.name for language in languages"
+		        class="languages"
+		        disabled="disabled"
+		        advanced-select="">
+			</select>
+		</div>
+		<button class="triggerChangeWithjQuery" data-target-id="languages4">Change with jQuery</button>
+
+		<hr />
 	</body>
 </html>

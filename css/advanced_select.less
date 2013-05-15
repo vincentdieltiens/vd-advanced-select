@@ -194,7 +194,7 @@
 			ul {
 				margin: 0;
 				padding: 0;
-				
+
 				& > li .label { 
 					padding-left: 20px;
 					& > li .label {
@@ -274,6 +274,25 @@
 				b {
 					background-position: -18px 1px;
 				}
+			}
+		}
+	}
+
+	&.disabled {
+		.advanced-select-choice {
+			background-color: #f4f4f4;
+			background-image: none;
+			border: 1px solid #ddd;
+			cursor: default;
+
+			div.arrow {
+				background-color: #f4f4f4;
+				background-image: none;
+				border-left: 0;
+			}
+
+			abbr {
+				display: none
 			}
 		}
 	}
