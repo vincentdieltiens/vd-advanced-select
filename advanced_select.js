@@ -57,21 +57,27 @@ angular.module('vd.directive.advanced_select', [])
 				var tabIndex = this.select.attr('tabindex') ? this.select.attr('tabindex') : '';
 				var fakeSelect = angular.element('<div class="advanced-select-container" ng-class="{ \'advanced-select-dropdown-open\': dropDownOpen }">' + 
 					'<a href="javascript:void(0)" ng-click="dropDownOpen=!dropDownOpen" class="advanced-select-choice" tabindex="' + tabIndex + '">' + 
-						'<span ng-bind="selected.target' + this.label + '"></span>' + 
+						'<span ng-bind="selected.label"></span>' + 
 						'<abbr class="advanced-select-search-choice-close" style="display: none;"></abbr>' + 
 						'<div class="arrow"><b></b></div>' + 
 					'</a>' + 
 					'<div class="advanced-select-drop" ng-show="dropDownOpen">' + 
-						'<div class="advanced-select-search">' + 
+						'<div class="search">' + 
 							'<input type="text" ng-model="search" autocomplete="off" class="advanced-select-input" tabindex="-1" />' + 
 						'</div>' + 
-						'<ul class="advanced-select-results">' + 
-							'<li class="advanced-select-result advanced-select-result-selectable" ng-repeat="' + this.item + ' in options | filter:search" ng-click="select(' + this.item + ', true, true)" ng-mouseover="highlight(' + this.item + ')" ng-class="{ \'advanced-select-highlighted\': ' + this.item + '.highlighted == true }">' + 
-								'<div class="advanced-select-result-label" ng-bind="' + this.item + '.target' + this.label + '"></div>' + 
+						'<ul class="results">' + 
+							'<li class="advanced-select-result advanced-select-result-selectable" ng-repeat="' + this.item + ' in options | filter:search"  ng-class="{ \'with-children\': '+ this.item +'.children.length > 0 }">' + 
+								'<div class="label" ng-bind="' + this.item + '.label" ng-class="{ \'advanced-select-highlighted\': ' + this.item + '.highlighted == true }" ng-click="select(' + this.item + ', true, true)" ng-mouseover="highlight(' + this.item + ')"></div>' + 
+								'<ul>' +
+									'<li class="advanced-select-result" ng-repeat="sub in ' + this.item + '.children"  ng-class="{ \'advanced-select-highlighted\': sub.highlighted == true }">'+
+										'<div class="label" ng-bind="sub.label" ng-click="select(sub, true, true)" ng-class="{ \'advanced-select-highlighted\': sub.highlighted == true }" ng-mouseover="highlight(sub)"></div>' +
+									'</li>'+
+								'</ul>' +
 							'</li>' + 
 						'</ul>' + 
 					'</div>' + 
 				'</div>');
+				
 				fakeSelect.addClass(this.select.attr('class'));
 				return fakeSelect;
 			}
@@ -95,40 +101,78 @@ angular.module('vd.directive.advanced_select', [])
 					$scope.highlighted.highlighted = true;
 				};
 
-				$scope.highlightPrevious = function() {
-					var results = $filter('filter')($scope.options, $scope.search);
-
-					if (!$scope.hasHighlighted(results)) {
-						$scope.highlight(results[0]);
-						return;
+				$scope.highlightPrevious = function(results, highlightPrevious) {
+					if (angular.isUndefined(results)) {
+						results = $filter('filter')($scope.options, $scope.search);
 					}
 
-					try {
-						angular.forEach(results, function(r, index) {
-							if (r.highlighted && angular.isDefined(results[index - 1])) {
-								$scope.highlight(results[index - 1]);
-								throw 0;
+					var res = {
+						jobDone: false,
+						highlightPrevious: angular.isDefined(highlightPrevious) ? highlightPrevious : false
+					};
+
+					for(var i=results.length-1; i >= 0; i--) {
+						var r = results[i];
+
+						if (r.children) {
+							res = $scope.highlightPrevious(r.children, res.highlightPrevious);
+							if (res.jobDone) {
+								break;
 							}
-						});
-					} catch (e) {}
+						}
+
+						if (res.highlightPrevious) {
+							$scope.highlight(r);
+							res = { jobDone: true, highlightPrevious: false }
+							break;
+						}
+
+						if (r.highlighted) {
+							res.highlightPrevious = true;
+						}
+
+						
+					}
+
+					return res;
 				}
 
-				$scope.highlightNext = function() {
-					var results = $filter('filter')($scope.options, $scope.search);
+				$scope.highlightNext = function(results, highlightNext) {
+					// Walks into the list of optins (results). When an highlighted item
+					// is found, set the marker "res.highlightNext" as true.
+					// At each step of the loop, if "res.highlightNext" is true, highlight the item and stop
+					// the loop with res.jobDone = true
 
-					if (!$scope.hasHighlighted(results)) {
-						$scope.highlight(results[0]);
-						return;
+					if (angular.isUndefined(results)) {
+						results = $filter('filter')($scope.options, $scope.search);
 					}
 
-					try {
-						angular.forEach(results, function(r, index) {
-							if (r.highlighted && angular.isDefined(results[index + 1])) {
-								$scope.highlight(results[index + 1]);
-								throw 0;
+					var res = {
+						jobDone: false,
+						highlightNext: angular.isDefined(highlightNext) ? highlightNext : false
+					};
+
+					for(var i=0, n=results.length; i < n; i++) {
+						var r = results[i];
+						if (res.highlightNext) {
+							$scope.highlight(r);
+							res = { jobDone: true, highlightNext: false }
+							break;
+						}
+
+						if (r.highlighted) {
+							res.highlightNext = true;
+						}
+
+						if (r.children) {
+							res = $scope.highlightNext(r.children, res.highlightNext);
+							if (res.jobDone) {
+								break;
 							}
-						});
-					} catch (e) {}
+						}
+					}
+
+					return res;
 				};
 
 				$scope.hasHighlighted = function(results) {
@@ -140,6 +184,10 @@ angular.module('vd.directive.advanced_select', [])
 						angular.forEach(results, function(r) {
 							if (r.highlighted) {
 								throw 0;
+							} else {
+								if (r.children && $scope.hasHighlighted(r.children)) {
+									throw 0;
+								}
 							}
 						});
 					} catch (e) {
@@ -154,8 +202,10 @@ angular.module('vd.directive.advanced_select', [])
 				var setNgModel = getNgModel.assign;
 
 				var label = "label",
+				    labelFn = $parse(label),
 				    item = "item",
 				    optionsModel = null,
+				    groupBy = null,
 				    objects = []
 				    compareWith = [];
 
@@ -163,7 +213,10 @@ angular.module('vd.directive.advanced_select', [])
 					var match = attrs.ngOptions.match(NG_OPTIONS_REGEXP),
 					item = match[4] || match[6];
 					label = (match[2] || match[1]).replace(new RegExp(item), '');
+					labelFn = $parse(label.replace(new RegExp('^\.'), '') || '');
 					compareWith = match[2] ? match[1].replace(new RegExp(item + '\.?'), '') : null;
+					groupBy = match[3],
+				    groupByFn = $parse((match[3] || '').replace(new RegExp(item + '\.?'), '') || ''),
 					optionsModel = match[7];
 					fillInResultsFromNgOptions();
 				} else {
@@ -183,7 +236,7 @@ angular.module('vd.directive.advanced_select', [])
 
 				scope.$watch('dropDownOpen', function() {
 					if (scope.dropDownOpen) {
-						$(document).unbind('keydown.advanced_select')
+						$(document).bind('keydown.advanced_select', handleKeysWhenDropDownOpened)
 						           .bind('mousedown.advanced_select', handleMouseWhenDropDownOpened);
 						scope.fakeSelect.dropDownOpened();
 					} else {
@@ -237,13 +290,38 @@ angular.module('vd.directive.advanced_select', [])
 				 */
 				function fillInResultsFromNgOptions() {
 					scope.$watch(optionsModel, function(items) {
-						scope.options = [];
-						angular.forEach(items, function(item) {
-							scope.options.push({
-								target: item
+						
+
+						if (groupBy != null) {
+							scope.options = [];
+							var groups = {};
+
+							angular.forEach(items, function(item) {
+								var groupByName = groupByFn(scope, item) || '';
+								if (!angular.isDefined(groups[groupByName])) {
+									groups[groupByName] = [];
+								}
+								groups[groupByName].push({ target: item, label: labelFn(item) });
 							});
-						});
-						scope.updateSelection(getNgModel(scope));
+
+							angular.forEach(groups, function(subitems, groupName) {
+								scope.options.push({
+									target: null,
+									label: groupName,
+									children: subitems
+								});
+							});
+
+						} else {
+							scope.options = [];
+							angular.forEach(items, function(item) {
+								scope.options.push({
+									target: item,
+									label: labelFn(item)
+								});
+							});
+							scope.updateSelection(getNgModel(scope));
+						}
 					}, true);
 				}
 

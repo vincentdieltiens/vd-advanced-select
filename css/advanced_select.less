@@ -140,7 +140,7 @@
 			 -o-box-shadow: 0 4px 5px rgba(0, 0, 0, .15);
 				box-shadow: 0 4px 5px rgba(0, 0, 0, .15);
 
-		.advanced-select-search {
+		.search {
 			display: inline-block;
 			width: 100%;
 			min-height: 22px;
@@ -183,7 +183,7 @@
 			}
 		}
 
-		.advanced-select-results {
+		.results {
 			max-height: 200px;
 			padding: 0 0 0 4px;
 			margin: 4px 4px 4px 0;
@@ -191,15 +191,17 @@
 			overflow-x: hidden;
 			overflow-y: auto;
 
-			ul.advanced-select-result-sub {
+			ul {
 				margin: 0;
-				& > li .advanced-select-result-label { 
+				padding: 0;
+				
+				& > li .label { 
 					padding-left: 20px;
-					& > li .advanced-select-result-label {
+					& > li .label {
 						padding-left: 40px;
-						& > li .advanced-select-result-label {
+						& > li .label {
 							padding-left: 60px;
-							& > li .advanced-select-result-label {
+							& > li .label {
 								padding-left: 80px;
 							}
 						}
@@ -211,7 +213,7 @@
 				list-style: none;
 				display: list-item;
 
-				&.advanced-select-result-with-children > .advanced-select-result-label {
+				&.with-children > .label {
 					font-weight: bold;
 				}
 
@@ -220,7 +222,7 @@
 					font-style: normal;
 				}
 
-				&.advanced-select-highlighted {
+				& > .advanced-select-highlighted {
 					background: #3875d7;
 					color: #fff;
 
@@ -230,7 +232,7 @@
 				}
 			}
 
-			.advanced-select-result-label {
+			.label {
 				padding: 3px 7px 4px;
 				margin: 0;
 				cursor: pointer;
@@ -279,8 +281,8 @@
 
 .advanced-select-container,
 .advanced-select-drop,
-.advanced-select-search,
-.advanced-select-search input{
+.advanced-select-container .search,
+.advanced-select-container .search input{
   /*
 	Force border-box so that % widths fit the parent
 	container without overlap because of margin/padding.
