@@ -18,6 +18,7 @@
 			<label for="languages0">Initial Select :</label>
 			<select id="languages0" ng-model="language.id" 
 			        ng-options="language.id as language.name for language in languages"
+			        placeholder="select a language"
 			        class="languages">
 			</select>
 		</div>
@@ -26,6 +27,7 @@
 			<select id="languages1" ng-model="language.id" 
 		        ng-options="language.id as language.name for language in languages"
 		        class="languages"
+		        placeholder="select a language"
 		        advanced-select="">
 			</select>
 		</div>
@@ -142,5 +144,25 @@
 		<button class="triggerChangeWithjQuery" data-target-id="languages4">Change with jQuery</button>
 
 		<hr />
+
+		<h2>Long list</h2>
+		<div>
+			<label for="years">Initial Select :</label>
+			<select id="years" 
+			        ng-model="year" 
+			        ng-options="year for year in years"
+			        class="years">
+			</select>
+		</div>
+		<div>
+			<label for="years1">Advanced Select : </label>
+			<select id="years1" 
+			        ng-model="year" 
+			        ng-options="year for year in years"
+			        class="years"
+		        advanced-select="">
+			</select>
+		</div>
+		<button class="triggerChangeWithjQuery" data-target-id="numbers">Change with jQuery</button>
 	</body>
 </html>

@@ -70,6 +70,12 @@ angular.module('app', ['vd.directive.advanced_select'])
 		$scope.language2 = { id: null };
 
 		$scope.language3 = { id: null };
+
+		$scope.year = 2007;
+		$scope.years = [];
+		for(var i=1940; i < 2013; i++) {
+			$scope.years.push(i);
+		}
 	});
 
 $(document).ready(function() {

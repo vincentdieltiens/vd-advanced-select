@@ -62,7 +62,7 @@ angular.module('vd.directive.advanced_select', [])
 				var tabIndex = this.select.attr('tabindex') ? this.select.attr('tabindex') : '';
 				var fakeSelect = angular.element('<div class="advanced-select-container" ng-class="{ \'advanced-select-dropdown-open\': dropDownOpen, \'disabled\': disabled }">' + 
 					'<a href="javascript:void(0)" ng-click="dropDownOpen=(!disabled && !dropDownOpen)" class="advanced-select-choice" tabindex="' + tabIndex + '">' + 
-						'<span ng-bind="selected.label"></span>' + 
+						'<span ng-bind="selected.label || placeholder" ng-class="{ \'placeholder\': selected == null }"></span>' + 
 						'<abbr class="advanced-select-search-choice-close" style="display: none;"></abbr>' + 
 						'<div class="arrow"><b></b></div>' + 
 					'</a>' + 
@@ -92,12 +92,13 @@ angular.module('vd.directive.advanced_select', [])
 			restrict: 'A',
 			require: '^ngModel',
 			scope: true,
-			controller: function($scope) {
+			controller: function($scope, $element, $attrs) {
 				$scope.options = [];
 				$scope.dropDownOpen = false;
 				$scope.highlighted = null;
 				$scope.search = '';
 				$scope.disabled = false;
+				$scope.placeholder = $attrs.placeholder;
 
 				$scope.highlight = function(item) {
 					if ($scope.highlighted) {
