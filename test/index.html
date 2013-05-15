@@ -157,8 +157,8 @@
 		<div>
 			<label for="years1">Advanced Select : </label>
 			<select id="years1" 
-			        ng-model="year" 
-			        ng-options="year for year in years"
+			        ng-model="$parent.year" 
+			        ng-options="year for year in $parent.years"
 			        class="years"
 		        advanced-select="">
 			</select>
