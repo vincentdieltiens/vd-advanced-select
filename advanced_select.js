@@ -60,7 +60,7 @@ angular.module('vd.directive.advanced_select', [])
 			},
 			createFakeSelect: function() {
 				var tabIndex = this.select.attr('tabindex') ? this.select.attr('tabindex') : '';
-				var fakeSelect = angular.element('<div class="advanced-select-container" ng-class="{ \'advanced-select-dropdown-open\': dropDownOpen, \'disabled\': disabled }">' + 
+				var fakeSelect = angular.element('<div class="advanced-select-container top" ng-class="{ \'advanced-select-dropdown-open\': dropDownOpen, \'disabled\': disabled }">' + 
 					'<a href="javascript:void(0)" ng-click="dropDownOpen=(!disabled && !dropDownOpen)" class="advanced-select-choice" tabindex="' + tabIndex + '">' + 
 						'<span ng-bind="selected.label || placeholder" ng-class="{ \'placeholder\': selected == null }"></span>' + 
 						'<abbr class="advanced-select-search-choice-close" style="display: none;"></abbr>' + 
@@ -82,9 +82,15 @@ angular.module('vd.directive.advanced_select', [])
 						'</ul>' + 
 					'</div>' + 
 				'</div>');
-				
+
 				fakeSelect.addClass(this.select.attr('class'));
 				return fakeSelect;
+			},
+			dropDownBelow: function() {
+				fakeSelect.find('.results').before(fakeSelect.find('.search').detach());
+			},
+			dropDownAbove: function() {
+				fakeSelect.find('.results').after(fakeSelect.find('.search').detach());
 			}
 		};
 
@@ -246,6 +252,9 @@ angular.module('vd.directive.advanced_select', [])
 					if (scope.dropDownOpen) {
 						$(document).bind('keydown.advanced_select', handleKeysWhenDropDownOpened)
 						           .bind('mousedown.advanced_select', handleMouseWhenDropDownOpened);
+						if (fakeSelect.offset().top + fakeSelect.height() + ) {
+
+						}
 						scope.fakeSelect.dropDownOpened();
 					} else {
 						$(document).unbind('mousedown.advanced_select')
