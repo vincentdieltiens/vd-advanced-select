@@ -57,10 +57,16 @@ angular.module('vd.directive.advanced_select', [])
 			},
 			dropDownOpened: function() {
 				this.element.find('input').focus();
+				if (this.element.offset().top + this.element.outerHeight() + this.element.find('.advanced-select-drop').outerHeight() 
+						<= $(window).scrollTop() + document.documentElement.clientHeight) {
+					this.dropDownBelow();
+				} else {
+					this.dropDownAbove();
+				}
 			},
 			createFakeSelect: function() {
 				var tabIndex = this.select.attr('tabindex') ? this.select.attr('tabindex') : '';
-				var fakeSelect = angular.element('<div class="advanced-select-container top" ng-class="{ \'advanced-select-dropdown-open\': dropDownOpen, \'disabled\': disabled }">' + 
+				var fakeSelect = angular.element('<div class="advanced-select-container" ng-class="{ \'advanced-select-dropdown-open\': dropDownOpen, \'disabled\': disabled }">' + 
 					'<a href="javascript:void(0)" ng-click="dropDownOpen=(!disabled && !dropDownOpen)" class="advanced-select-choice" tabindex="' + tabIndex + '">' + 
 						'<span ng-bind="selected.label || placeholder" ng-class="{ \'placeholder\': selected == null }"></span>' + 
 						'<abbr class="advanced-select-search-choice-close" style="display: none;"></abbr>' + 
@@ -87,10 +93,12 @@ angular.module('vd.directive.advanced_select', [])
 				return fakeSelect;
 			},
 			dropDownBelow: function() {
-				fakeSelect.find('.results').before(fakeSelect.find('.search').detach());
+				this.element.removeClass('top');
+				this.element.find('.results').before(this.element.find('.search').detach());
 			},
 			dropDownAbove: function() {
-				fakeSelect.find('.results').after(fakeSelect.find('.search').detach());
+				this.element.addClass('top');
+				this.element.find('.results').after(this.element.find('.search').detach());
 			}
 		};
 
@@ -252,9 +260,11 @@ angular.module('vd.directive.advanced_select', [])
 					if (scope.dropDownOpen) {
 						$(document).bind('keydown.advanced_select', handleKeysWhenDropDownOpened)
 						           .bind('mousedown.advanced_select', handleMouseWhenDropDownOpened);
-						if (fakeSelect.offset().top + fakeSelect.height() + ) {
-
-						}
+						console.log(scope.fakeSelect.element.offset().top,
+							scope.fakeSelect.element.outerHeight(),
+							$(window).scrollTop(),
+							document.documentElement.clientHeight
+						);
 						scope.fakeSelect.dropDownOpened();
 					} else {
 						$(document).unbind('mousedown.advanced_select')
@@ -292,14 +302,20 @@ angular.module('vd.directive.advanced_select', [])
 							scope.$apply();
 							break;
 						case 27: // Escape
+							e.preventDefault();
+							e.stopPropagation();
 							scope.dropDownOpen = false;
 							scope.$apply();
 							break;
 						case 38: // Up
+							e.preventDefault();
+							e.stopPropagation();
 							scope.highlightPrevious();
 							scope.$apply();
 							break;
 						case 40: // Down
+							e.preventDefault();
+							e.stopPropagation();
 							scope.highlightNext();
 							scope.$apply();
 							break;
