@@ -180,7 +180,7 @@ angular.module('vd.directive.advanced_select', [])
 			}],
 			link: function(scope, element, attrs) {
 				// ngModel
-				var getNgModel = $parse(attrs.ngModel);
+				var getNgModel = $parse('$parent.'+attrs.ngModel);
 				var setNgModel = getNgModel.assign;
 
 				scope.select = function(item, updateModel, focus) {
@@ -272,7 +272,9 @@ angular.module('vd.directive.advanced_select', [])
 				});
 
 				scope.$watch(attrs.ngModel, function(ngModel) {
-					scope.updateSelection(ngModel);
+					if (ngModel != null) {
+						scope.updateSelection(ngModel);
+					}
 				}, true);
 
 				function handleMouseWhenDropDownOpened(e) {
@@ -347,8 +349,13 @@ angular.module('vd.directive.advanced_select', [])
 									label: labelFn(scope, item)
 								});
 							});
-							scope.updateSelection(getNgModel(scope));
+							
 						}
+						
+						if ((modelValue = getNgModel(scope)) != null) {
+							scope.updateSelection(modelValue);
+						}
+						
 					}, true);
 				}
 
