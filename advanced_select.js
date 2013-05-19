@@ -187,7 +187,9 @@ angular.module('vd.directive.advanced_select', [])
 					if ($scope.highlighted == null) {
 						return false;
 					}
-
+					if (angular.isUndefined(options) || options == null) {
+						options = $filter('filter')($scope.options, $scope.search);
+					}
 					for(var i=0, n = options.length; i < n; i++) {
 						var r = options[i];
 
