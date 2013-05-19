@@ -1,0 +1,3 @@
+[submodule "directives/advanced-select"]
+	path = directives/advanced-select
+	url = git://github.com/vincentdieltiens/advanced-select.git
