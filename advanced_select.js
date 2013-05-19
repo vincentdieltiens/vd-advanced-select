@@ -75,7 +75,7 @@ angular.module('vd.directive.advanced_select', [])
 				 *      item (which is the previous option) will be highlighted
 				 */
 				$scope.highlightPrevious = function(options, highlightPrevious) {
-					if (angular.isUndefined(options)) {
+					if (angular.isUndefined(options) || options == null) {
 						options = $filter('filter')($scope.options, $scope.search);
 					}
 
@@ -121,7 +121,7 @@ angular.module('vd.directive.advanced_select', [])
 					// At each step of the loop, if "res.highlightNext" is true, highlight the item and stop
 					// the loop with res.jobDone = true
 
-					if (angular.isUndefined(options)) {
+					if (angular.isUndefined(options) || options == null) {
 						options = $filter('filter')($scope.options, $scope.search);
 					}
 
@@ -152,6 +152,30 @@ angular.module('vd.directive.advanced_select', [])
 
 					return res;
 				};
+
+				/**
+				 * Highlight the first options in the given option's list
+				 * @param options (optional) : the list of options. If not 
+				 *      options given, the global options are used
+				 */
+				$scope.highlightFirst = function(options) {
+					if (angular.isUndefined(options) || options == null) {
+						options = $filter('filter')($scope.options, $scope.search);
+					}
+					$scope.highlight(options[0]);
+				}
+
+				/**
+				 * Highlight the last options in the given option's list
+				 * @param options (optional) : the list of options. If not 
+				 *      options given, the global options are used
+				 */
+				$scope.highlightLast = function(options) {
+					if (angular.isUndefined(options) || options == null) {
+						options = $filter('filter')($scope.options, $scope.search);
+					}
+					$scope.highlight(options[options.length-1]);
+				}
 
 				/**
 				 * Get if the given list of options has a highlighted option
@@ -255,6 +279,10 @@ angular.module('vd.directive.advanced_select', [])
 							element.addClass('top');
 							element.find('.results').after(element.find('.search').detach());
 						}
+
+						if (!scope.hasHighlighted()) {
+							scope.highlightFirst();
+						}
 						
 					} else {
 						$(document).unbind('mousedown.advanced_select')
@@ -303,13 +331,17 @@ angular.module('vd.directive.advanced_select', [])
 						case 38: // Up
 							e.preventDefault();
 							e.stopPropagation();
-							scope.highlightPrevious();
+							if (!scope.highlightPrevious().jobDone) {
+								scope.highlightLast();
+							}
 							scope.$apply();
 							break;
 						case 40: // Down
 							e.preventDefault();
 							e.stopPropagation();
-							scope.highlightNext();
+							if (!scope.highlightNext().jobDone) {
+								scope.highlightFirst();
+							}
 							scope.$apply();
 							break;
 					}
