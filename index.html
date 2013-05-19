@@ -1,0 +1,332 @@
+<!doctype html>
+<html ng-app="app">
+	<head>
+		<title>AngularJS Advanced Select</title>
+		<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+		<link rel="stylesheet" type="text/css" href="directives/advanced-select/css/advanced_select.css" />
+		<link rel="stylesheet" type="text/css" href="directives/tabs/css/tabs.css" />
+		<link rel="stylesheet" tyoe="text/css" href="css/prettify.css" />
+		<link rel="stylesheet" type="text/css" href="css/index.css" />
+		<script type="text/javascript" src="http://ivaynberg.github.io/select2/prettify/prettify.min.js"></script>
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.6/angular.min.js"></script>
+		<script type="text/javascript" src="directives/tabs/tabs.js"></script>
+		<script type="text/javascript" src="directives/advanced-select/advanced_select.js"></script>
+		<script type="text/javascript" src="js/index.js"></script>
+	</head>
+	<body>
+
+		<!--####### EXAMPLE 1 #######-->
+		<div class="example" ng-controller="example1">
+			<div class="result">
+				<h2>Simple List of objects</h2>
+				<select id="languages1" ng-model="language.id" 
+				    ng-options="language.id as language.name for language in languages"
+				    class="languages"
+				    placeholder="select a language"
+				    advanced-select>
+				</select>
+				<br /><br />
+				Selected Language Id : {{ language.id != null || 'none' }}
+			</div>
+			<div class="code">
+				<h2>Code</h2>
+				<tabs>
+					<tab name="Html">
+						<pre class="prettyprint linenums">
+&lt;div ng-controller="example1"&gt;
+	&lt;select 
+	    ng-model="language.id" 
+	    ng-options="language.id as language.name for language in languages"
+	    class="languages"
+	    placeholder="select a language"
+	    advanced-select&gt;
+	&lt;/select&gt;
+&lt;/div&gt;
+						</pre>
+					</tab>
+					<tab name="AngularJS">
+						<pre class="prettyprint linenums">
+app.controller('example1', function($scope) {
+	$scope.language = { id: null };
+	$scope.languages = [
+		{ id: 0, name: 'English' }, 
+		{ id: 1, name: 'Français' }, 
+		{ id: 2, name: 'Italiano' }
+	];
+})
+						</pre>
+					</tab>
+					<tab name="CSS">
+						<pre class="prettyprint linenums">
+.languages {
+	width: 200px;
+}
+						</pre>
+					</tab>
+				</tabs>
+			</div>
+		</div>
+
+		<!--####### EXAMPLE 2 #######-->
+		<div class="example" ng-controller="example2">
+			<div class="result">
+				<h2>Simple List of primitives</h2>
+				<select id="numbers1"
+			        ng-model="number" 
+			        ng-options="number for number in numbers"
+			        class="numbers"
+		        advanced-select>
+			</select>
+				<br /><br />
+				Selected numer : {{ number || 'none' }}
+			</div>
+			<div class="code">
+				<h2>Code</h2>
+				<tabs>
+					<tab name="Html">
+						<pre class="prettyprint linenums">
+&lt;div ng-controller="example1"&gt;
+	&lt;select
+	    ng-model="number" 
+	    ng-options="number for number in numbers"
+	    class="numbers"
+	    advanced-select&gt;
+	&lt;/select&gt;
+&lt;/div&gt;
+						</pre>
+					</tab>
+					<tab name="AngularJS">
+						<pre class="prettyprint linenums">
+app.controller('example2', function($scope) {
+	$scope.number = 0;
+	$scope.numbers = [5, 10, 15, 20, 25, 30];
+})
+						</pre>
+					</tab>
+					<tab name="CSS">
+						<pre class="prettyprint linenums">
+.numbers {
+	width: 100px;
+}
+						</pre>
+					</tab>
+				</tabs>
+			</div>
+		</div>
+
+		<!--####### EXAMPLE 3 #######-->
+		<div class="example" ng-controller="example3">
+			<div class="result">
+				<h2>List of remote objects (loaded in 3 seconds)</h2>
+				<select id="countries1"
+			        ng-model="country.id" 
+			        ng-options="country.id as country.name for country in countries"
+			        class="countries"
+		        	advanced-select>
+				</select>
+				<br /><br />
+				Selected country id : {{ country.id != null || 'none' }}
+			</div>
+			<div class="code">
+				<h2>Code</h2>
+				<tabs>
+					<tab name="Html">
+						<pre class="prettyprint linenums">
+&lt;div ng-controller="example3"&gt;
+	&lt;select
+	    ng-model="country.id" 
+	    ng-options="country.id as country.name for country in countries"
+	    class="countries"
+	    advanced-select&gt;
+	&lt;/select&gt;
+&lt;/div&gt;
+						</pre>
+					</tab>
+					<tab name="AngularJS">
+						<pre class="prettyprint linenums">
+app.controller('example3', function($scope, $timeout) {
+	$scope.country = { id: 1 };
+	$scope.countries = [];
+	$timeout(function() {
+		$scope.countries = [
+			{ id: 0, name: 'Belgium' }, 
+			{ id: 1, name: 'France' }, 
+			{ id: 2, name: 'Luxembourg' }, 
+			{ id: 3, name: 'United States' }
+		];
+	}, 3000);
+})
+						</pre>
+					</tab>
+					<tab name="CSS">
+						<pre class="prettyprint linenums">
+.countries {
+	width: 200px;
+}
+						</pre>
+					</tab>
+				</tabs>
+			</div>
+		</div>
+
+		<!--####### EXAMPLE 4 #######-->
+		<div class="example" ng-controller="example4">
+			<div class="result">
+				<h2>List of grouped objects</h2>
+				<select id="languages3"
+			        ng-model="language.id" 
+			        ng-options="language.id as language.name group by language.group for language in languages"
+			        class="languages"
+		        advanced-select>
+				</select>
+				<br /><br />
+				Selected language id : {{ language.id != null || 'none' }}
+			</div>
+			<div class="code">
+				<h2>Code</h2>
+				<tabs>
+					<tab name="Html">
+						<pre class="prettyprint linenums">
+&lt;div ng-controller="example4"&gt;
+	&lt;select
+	    ng-model="language.id" 
+	    ng-options="language.id as language.name group by language.group for language in languages"
+	    class="languages"
+	    advanced-select&gt;
+	&lt;/select&gt;
+&lt;/div&gt;
+						</pre>
+					</tab>
+					<tab name="AngularJS">
+						<pre class="prettyprint linenums">
+app.controller('example4', function($scope) {
+	$scope.language = { id: null };
+	$scope.languages = [
+		{ id: 1, name: 'French (BE)', group: 'French' },
+		{ id: 2, name: 'French (FR)', group: 'French' },
+		{ id: 3, name: 'French (CA)', group: 'French' },
+		{ id: 4, name: 'English (US)', group: 'English'},
+		{ id: 5, name: 'English (UK)', group: 'English'}
+	];
+})
+						</pre>
+					</tab>
+					<tab name="CSS">
+						<pre class="prettyprint linenums">
+.languages {
+	width: 200px;
+}
+						</pre>
+					</tab>
+				</tabs>
+			</div>
+		</div>
+
+		<!--####### EXAMPLE 5 #######-->
+		<div class="example" ng-controller="example5">
+			<div class="result">
+				<h2>Simple List of objects</h2>
+				<select id="languages1" ng-model="language.id" 
+				    ng-options="language.id as language.name for language in languages"
+				    class="languages"
+				    placeholder="select a language"
+				    disabled="disabled"
+				    advanced-select>
+				</select>
+				<br /><br />
+				Selected Language Id : {{ language.id != null || 'none' }}
+			</div>
+			<div class="code">
+				<h2>Code</h2>
+				<tabs>
+					<tab name="Html">
+						<pre class="prettyprint linenums">
+&lt;div ng-controller="example1"&gt;
+	&lt;select 
+	    ng-model="language.id" 
+	    ng-options="language.id as language.name for language in languages"
+	    class="languages"
+	    placeholder="select a language"
+	    disabled="disabled"
+	    advanced-select&gt;
+	&lt;/select&gt;
+&lt;/div&gt;
+						</pre>
+					</tab>
+					<tab name="AngularJS">
+						<pre class="prettyprint linenums">
+app.controller('example1', function($scope) {
+	$scope.language = { id: null };
+	$scope.languages = [
+		{ id: 0, name: 'English' }, 
+		{ id: 1, name: 'Français' }, 
+		{ id: 2, name: 'Italiano' }
+	];
+})
+						</pre>
+					</tab>
+					<tab name="CSS">
+						<pre class="prettyprint linenums">
+.languages {
+	width: 200px;
+}
+						</pre>
+					</tab>
+				</tabs>
+			</div>
+		</div>
+
+		<!--####### EXAMPLE 6 #######-->
+		<div class="example" ng-controller="example6">
+			<div class="result">
+				<h2>Long list</h2>
+				<select 
+			        ng-model="year" 
+			        ng-options="year for year in years"
+			        placeholder="Select a year"
+			        class="years"
+		            advanced-select>
+				</select>
+				<br /><br />
+				Selected Year : {{ year || 'none' }}
+			</div>
+			<div class="code">
+				<h2>Code</h2>
+				<tabs>
+					<tab name="Html">
+						<pre class="prettyprint linenums">
+&lt;div ng-controller="example6"&gt;
+	&lt;select 
+	    ng-model="year" 
+	    ng-options="year for year in years"
+	    placeholder="Select a year"
+	    class="years"
+	    advanced-select&gt;
+	&lt;/select&gt;
+&lt;/div&gt;
+						</pre>
+					</tab>
+					<tab name="AngularJS">
+						<pre class="prettyprint linenums">
+app.controller('example6', function($scope, $timeout) {
+	$scope.year = null;
+	$scope.years = [];
+	for(var i=1940; i &lt; 2013; i++) {
+		$scope.years.push(i);
+	}
+});
+						</pre>
+					</tab>
+					<tab name="CSS">
+						<pre class="prettyprint linenums">
+.years {
+	width: 100px;
+}
+						</pre>
+					</tab>
+				</tabs>
+			</div>
+		</div>
+	</body>
+</html>

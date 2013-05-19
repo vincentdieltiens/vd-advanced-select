@@ -21,9 +21,25 @@ angular.module('vd.directive.advanced_select', [])
 			}
 		};
 	})
-	.directive('advancedSelect', function($parse, $filter) {
+	.directive('advancedSelect', function($parse, $filter, $templateCache, $http) {
 		                       //0000111110000000000022220000000000000000000000333300000000000000444444444444444440000000005555555555555555500000006666666666666666600000000000000077770
 		var NG_OPTIONS_REGEXP = /^\s*(.*?)(?:\s+as\s+(.*?))?(?:\s+group\s+by\s+(.*))?\s+for\s+(?:([\$\w][\$\w\d]*)|(?:\(\s*([\$\w][\$\w\d]*)\s*,\s*([\$\w][\$\w\d]*)\s*\)))\s+in\s+(.*)$/;
+
+		(function(){
+  this.__defineGetter__("__FILE__", function() {
+    var stack=((new Error).stack).split("\n");
+ 
+    if(stack[0]=="Error") { // Chromium
+      var m;
+      if(m=stack[2].match(/\((.*):[0-9]+:[0-9]+\)/))
+	return m[1];
+    }
+    else { // Firefox, Opera
+      return stack[1].split("@")[1].split(":").slice(0,-1).join(":");
+    }
+  });
+})();
+		console.log('===>', __FILE__);
 
 		return {
 			restrict: 'E',
@@ -373,6 +389,38 @@ angular.module('vd.directive.advanced_select', [])
 					});
 				}
 			},
-			templateUrl: '../templates/advanced_select.html'
+			template: '<div class="advanced-select-container" ng-class="{ \'advanced-select-dropdown-open\': dropDownOpen, \'disabled\': disabled }">'+
+	'<a href="javascript:void(0)" ng-click="dropDownOpen=(!disabled && !dropDownOpen)" class="advanced-select-choice" tabindex="tabIndex">'+
+		'<span ng-bind="selected.label || placeholder" ng-class="{ \'placeholder\': selected == null }"></span>'+
+			'<abbr class="advanced-select-search-choice-close" style="display: none;"></abbr>'+
+			'<div class="arrow"><b></b></div>'+
+	'</a>'+
+	'<div class="advanced-select-drop" ng-show="dropDownOpen">'+
+		'<div class="search">'+
+			'<input type="text" ng-model="search" autocomplete="off" class="advanced-select-input" tabindex="-1" />'+
+		'</div>'+
+		'<ul class="results">'+
+			'<li class="advanced-select-result advanced-select-result-selectable" ng-repeat="item in options | filter:search"  ng-class="{ \'with-children\': item.children.length > 0 }">'+
+				'<div advanced-select-item '+
+				     'class="label" '+
+				     'ng-bind="item.label" ' + 
+				     'ng-class="{ \'advanced-select-highlighted\': item.highlighted == true }" '+ 
+				     'ng-click="select(item, true, true)" '+
+				     'ng-mouseover="highlight(item, this)">'+
+				'</div>'+
+				'<ul>'+
+					'<li class="advanced-select-result" ng-repeat="sub in item.children"  ng-class="{ \'advanced-select-highlighted\': sub.highlighted == true }">'+
+						'<div class="label" '+
+						     'ng-bind="sub.label" '+
+						     'ng-click="select(sub, true, true)" '+
+						     'ng-class="{ \'advanced-select-highlighted\': sub.highlighted == true }" '+
+						     'ng-mouseover="highlight(sub)">'+
+						'</div>'+
+					'</li>'+
+				'</ul>'+
+			'</li>'+
+		'</ul>'+
+	'</div>'+
+'</div>'
 		}
 	});
