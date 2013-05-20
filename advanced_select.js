@@ -56,7 +56,7 @@ angular.module('vd.directive.advanced_select', [])
 			return newList;
 		}
 	})
-	.directive('advancedSelectMultiple', function($parse, $filter) {
+	.directive('advancedSelectMultiple', function($parse, $filter, $timeout) {
 		return {
 			restrict: 'A',
 			require: 'advancedSelect',
@@ -116,6 +116,11 @@ angular.module('vd.directive.advanced_select', [])
 						scope.setNgModel(scope, m);
 					}
 
+					$timeout(function() {
+						adjustSearchInputWidth();
+					});
+					
+
 					// Hide the drop down
 					scope.dropDownOpen = false;
 				};
@@ -149,7 +154,7 @@ angular.module('vd.directive.advanced_select', [])
 
 				scope.unselectLast = function(e) {
 					scope.unselect(null, scope.selected.length-1, e)
-				}
+				};
 
 				scope.unselect = function(choice, index, e) {
 					if (e) {
@@ -164,9 +169,17 @@ angular.module('vd.directive.advanced_select', [])
 					scope.selected.splice(index, 1);
 					scope.dropDownOpen = false;
 					element.find('input').focus();
+
+					$timeout(function() {
+						adjustSearchInputWidth();
+					});
 				};
 
-
+				function adjustSearchInputWidth() {
+					var lastSelected = element.find('.advanced-select-choices li:not(.search)').last();
+					var width = element.width() - (lastSelected.offset().left + lastSelected.outerWidth());
+					element.find('input').width(width);
+				}
 			},
 			template: 
 			'<div class="advanced-select-container" ng-class="{ \'advanced-select-dropdown-open\': dropDownOpen, \'disabled\': disabled }">'+
