@@ -47,6 +47,14 @@ angular.module('app', ['directive.tabs', 'vd.directive.advanced_select'])
 		for(var i=1940; i < 2013; i++) {
 			$scope.years.push(i);
 		}
+	})
+	.controller('example7', function($scope) {
+		$scope.selected_languages = [0, 2];
+		$scope.languages = [
+			{ id: 0, name: 'English' }, 
+			{ id: 1, name: 'Français' }, 
+			{ id: 2, name: 'Italiano' }
+		];
 	});
 
 $(document).ready(function() {
