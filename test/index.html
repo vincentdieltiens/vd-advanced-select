@@ -15,6 +15,7 @@
 		<script type="text/javascript" src="js/index.js"></script>
 	</head>
 	<body>
+		<a href="https://github.com/vincentdieltiens/advanced-select"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png" alt="Fork me on GitHub"></a>
 
 		<!--####### EXAMPLE 1 #######-->
 		<div class="example" ng-controller="example1">
@@ -350,7 +351,7 @@ app.controller('example6', function($scope, $timeout) {
 				<tabs>
 					<tab name="Html">
 						<pre class="prettyprint linenums">
-&lt;div ng-controller="example6"&gt;
+&lt;div ng-controller="example7"&gt;
 	&lt;select 
 	    ng-model="selected_languages" 
 	    ng-options="language.id as language.name for language in languages"
@@ -364,19 +365,20 @@ app.controller('example6', function($scope, $timeout) {
 					</tab>
 					<tab name="AngularJS">
 						<pre class="prettyprint linenums">
-app.controller('example6', function($scope, $timeout) {
-	$scope.year = null;
-	$scope.years = [];
-	for(var i=1940; i &lt; 2013; i++) {
-		$scope.years.push(i);
-	}
+app.controller('example7', function($scope) {
+	$scope.selected_languages = [0, 2];
+	$scope.languages = [
+		{ id: 0, name: 'English' }, 
+		{ id: 1, name: 'Français' }, 
+		{ id: 2, name: 'Italiano' }
+	];
 });
 						</pre>
 					</tab>
 					<tab name="CSS">
 						<pre class="prettyprint linenums">
-.years {
-	width: 100px;
+.languages {
+	width: 200px;
 }
 						</pre>
 					</tab>
