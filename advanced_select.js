@@ -177,8 +177,10 @@ angular.module('vd.directive.advanced_select', [])
 
 				function adjustSearchInputWidth() {
 					var lastSelected = element.find('.advanced-select-choices li:not(.search)').last();
-					var width = element.width() - (lastSelected.offset().left + lastSelected.outerWidth());
-					element.find('input').width(width);
+					if (lastSelected.length) {
+						var width = element.width() - (lastSelected.offset().left + lastSelected.outerWidth());
+						element.find('input').width(width);
+					}
 				}
 			},
 			template: 
