@@ -75,6 +75,10 @@ angular.module('vd.directive.advanced_select', [])
 
 				element.find('input').bind('keydown.advanced_select_multiple', handleKeys);
 
+				$timeout(function() {
+					adjustSearchInputWidth();
+				});
+
 				function handleKeys(e) {
 					switch(e.keyCode) {
 						case 8: // Backspace
@@ -185,10 +189,11 @@ angular.module('vd.directive.advanced_select', [])
 				function adjustSearchInputWidth() {
 					var lastSelected = element.find('.advanced-select-choices li:not(.search)').last();
 					if (lastSelected.length) {
-						var width = element.width() - (lastSelected.offset().left + lastSelected.outerWidth());
-						element.find('input').width(width);
+						var width = element.find('.advanced-select-choices').width() - (lastSelected.offset().left + lastSelected.outerWidth());
+						element.find('.search').width(width);
 					} else {
-						element.find('input').width(element.width());
+						console.log('--->>>>>', element.find('.advanced-select-choices').innerWidth())
+						element.find('.search').width(element.find('.advanced-select-choices').innerWidth());
 					}
 				}
 			},
