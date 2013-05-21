@@ -28,7 +28,7 @@
 				    advanced>
 				</select>
 				<br /><br />
-				Selected Language Id : {{ language.id != null || 'none' }}
+				Selected Language Id : {{ language.id }}
 			</div>
 			<div class="code">
 				<h2>Code</h2>
@@ -127,7 +127,7 @@ app.controller('example2', function($scope) {
 		        	advanced>
 				</select>
 				<br /><br />
-				Selected country id : {{ country.id != null || 'none' }}
+				Selected country id : {{ country.id }}
 			</div>
 			<div class="code">
 				<h2>Code</h2>
@@ -182,7 +182,7 @@ app.controller('example3', function($scope, $timeout) {
 		        advanced>
 				</select>
 				<br /><br />
-				Selected language id : {{ language.id != null || 'none' }}
+				Selected language id : {{ language.id || 'none' }}
 			</div>
 			<div class="code">
 				<h2>Code</h2>
@@ -236,7 +236,7 @@ app.controller('example4', function($scope) {
 				    advanced>
 				</select>
 				<br /><br />
-				Selected Language Id : {{ language.id != null || 'none' }}
+				Selected Language Id : {{ language.id || 'none' }}
 			</div>
 			<div class="code">
 				<h2>Code</h2>
