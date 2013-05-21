@@ -175,11 +175,17 @@ angular.module('vd.directive.advanced_select', [])
 					});
 				};
 
+				scope.getPlaceholder = function() {
+					return scope.selected.length ? '' : scope.placeholder;
+				};
+
 				function adjustSearchInputWidth() {
 					var lastSelected = element.find('.advanced-select-choices li:not(.search)').last();
 					if (lastSelected.length) {
 						var width = element.width() - (lastSelected.offset().left + lastSelected.outerWidth());
 						element.find('input').width(width);
+					} else {
+						element.find('input').width(element.width());
 					}
 				}
 			},
@@ -191,7 +197,7 @@ angular.module('vd.directive.advanced_select', [])
 						'<a href="javascript:void(0)" ng-click="unselect(choice, $index, $event)" tabindex="-1"></a>'+
 					'</li>'+
 					'<li class="search">'+
-						'<input type="text" autocomplete="off" autocorrect="off" tabIndex="tabIndex" ng-change="dropDownOpen=(!disabled)" ng-model="search" />'+
+						'<input type="text" autocomplete="off" autocorrect="off" tabIndex="tabIndex" ng-change="dropDownOpen=(!disabled)" ng-model="search" placeholder="{{ getPlaceholder() }}" />'+
 					'</li>'+
 				'</ul>'+
 				'<div class="advanced-select-drop" ng-show="dropDownOpen">'+
