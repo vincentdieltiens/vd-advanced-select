@@ -24,7 +24,7 @@
 				    ng-options="language.id as language.name for language in languages"
 				    class="languages"
 				    placeholder="select a language"
-				    advanced-select>
+				    advanced>
 				</select>
 				<br /><br />
 				Selected Language Id : {{ language.id != null || 'none' }}
@@ -40,7 +40,7 @@
 	    ng-options="language.id as language.name for language in languages"
 	    class="languages"
 	    placeholder="select a language"
-	    advanced-select&gt;
+	    advanced&gt;
 	&lt;/select&gt;
 &lt;/div&gt;
 						</pre>
@@ -76,7 +76,7 @@ app.controller('example1', function($scope) {
 			        ng-model="number" 
 			        ng-options="number for number in numbers"
 			        class="numbers"
-		        advanced-select>
+		        advanced>
 			</select>
 				<br /><br />
 				Selected numer : {{ number || 'none' }}
@@ -91,7 +91,7 @@ app.controller('example1', function($scope) {
 	    ng-model="number" 
 	    ng-options="number for number in numbers"
 	    class="numbers"
-	    advanced-select&gt;
+	    advanced&gt;
 	&lt;/select&gt;
 &lt;/div&gt;
 						</pre>
@@ -123,7 +123,7 @@ app.controller('example2', function($scope) {
 			        ng-model="country.id" 
 			        ng-options="country.id as country.name for country in countries"
 			        class="countries"
-		        	advanced-select>
+		        	advanced>
 				</select>
 				<br /><br />
 				Selected country id : {{ country.id != null || 'none' }}
@@ -138,7 +138,7 @@ app.controller('example2', function($scope) {
 	    ng-model="country.id" 
 	    ng-options="country.id as country.name for country in countries"
 	    class="countries"
-	    advanced-select&gt;
+	    advanced&gt;
 	&lt;/select&gt;
 &lt;/div&gt;
 						</pre>
@@ -178,7 +178,7 @@ app.controller('example3', function($scope, $timeout) {
 			        ng-model="language.id" 
 			        ng-options="language.id as language.name group by language.group for language in languages"
 			        class="languages"
-		        advanced-select>
+		        advanced>
 				</select>
 				<br /><br />
 				Selected language id : {{ language.id != null || 'none' }}
@@ -193,7 +193,7 @@ app.controller('example3', function($scope, $timeout) {
 	    ng-model="language.id" 
 	    ng-options="language.id as language.name group by language.group for language in languages"
 	    class="languages"
-	    advanced-select&gt;
+	    advanced&gt;
 	&lt;/select&gt;
 &lt;/div&gt;
 						</pre>
@@ -232,7 +232,7 @@ app.controller('example4', function($scope) {
 				    class="languages"
 				    placeholder="select a language"
 				    disabled="disabled"
-				    advanced-select>
+				    advanced>
 				</select>
 				<br /><br />
 				Selected Language Id : {{ language.id != null || 'none' }}
@@ -249,7 +249,7 @@ app.controller('example4', function($scope) {
 	    class="languages"
 	    placeholder="select a language"
 	    disabled="disabled"
-	    advanced-select&gt;
+	    advanced&gt;
 	&lt;/select&gt;
 &lt;/div&gt;
 						</pre>
@@ -286,7 +286,7 @@ app.controller('example5', function($scope) {
 			        ng-options="year for year in years"
 			        placeholder="Select a year"
 			        class="years"
-		            advanced-select>
+		            advanced>
 				</select>
 				<br /><br />
 				Selected Year : {{ year || 'none' }}
@@ -302,7 +302,7 @@ app.controller('example5', function($scope) {
 	    ng-options="year for year in years"
 	    placeholder="Select a year"
 	    class="years"
-	    advanced-select&gt;
+	    advanced&gt;
 	&lt;/select&gt;
 &lt;/div&gt;
 						</pre>
@@ -328,5 +328,61 @@ app.controller('example6', function($scope, $timeout) {
 				</tabs>
 			</div>
 		</div>
+
+		<!--####### EXAMPLE 7 #######-->
+		<div class="example" ng-controller="example7">
+			<div class="result">
+				<h2>Multiple list</h2>
+				<select 
+			        ng-model="selected_languages" 
+			        ng-options="language.id as language.name for language in languages"
+			        placeholder="Select one or more language"
+			        class="languages"
+			        multiple="true"
+		            advanced>
+				</select>
+				<br /><br />
+				Selected languages : {{ selected_languages }}
+			</div>
+			<div class="code">
+				<h2>Code</h2>
+				<tabs>
+					<tab name="Html">
+						<pre class="prettyprint linenums">
+&lt;div ng-controller="example7"&gt;
+	&lt;select 
+	    ng-model="selected_languages" 
+	    ng-options="language.id as language.name for language in languages"
+	    placeholder="Select one or more language"
+	    class="languages"
+	    multiple="true"
+	    advanced&gt;
+	&lt;/select&gt;
+&lt;/div&gt;
+						</pre>
+					</tab>
+					<tab name="AngularJS">
+						<pre class="prettyprint linenums">
+app.controller('example7', function($scope) {
+	$scope.selected_languages = [0, 2];
+	$scope.languages = [
+		{ id: 0, name: 'English' }, 
+		{ id: 1, name: 'Français' }, 
+		{ id: 2, name: 'Italiano' }
+	];
+});
+						</pre>
+					</tab>
+					<tab name="CSS">
+						<pre class="prettyprint linenums">
+.languages {
+	width: 200px;
+}
+						</pre>
+					</tab>
+				</tabs>
+			</div>
+		</div>
+
 	</body>
 </html>
