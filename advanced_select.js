@@ -2,7 +2,7 @@ angular.module('vd.directive.advanced_select', [])
 	.directive('advanced', function($compile) {
 		return {
 			restrict: 'A',
-			require: '^ngModel',
+			require: 'ngModel',
 			controller: function() {
 
 			},
@@ -40,7 +40,9 @@ angular.module('vd.directive.advanced_select', [])
 			})
 
 			var newList = [];
-			angular.forEach(list, function(item) {
+			for( var i=0, n=list.length; i < n; i++) {
+			//angular.forEach(list, function(item) {
+				var item = list[i];
 				var isExcluded = false;
 				var value = valueFn(item.target);
 				angular.forEach(excludeValues, function(excludeValue) {
@@ -52,7 +54,7 @@ angular.module('vd.directive.advanced_select', [])
 				if (!isExcluded) {
 					newList.push(item);
 				}
-			});
+			}
 			return newList;
 		}
 	})
@@ -102,7 +104,7 @@ angular.module('vd.directive.advanced_select', [])
 				scope.select = function(item, updateModel, focus) {
 					//scope.selected = angular.extend(scope.selected, [item]);
 					pushOnce(scope.selected, item);
-					scope.highlight(item);
+					//scope.highlight(item);
 
 					// Set the focus
 					if (angular.isDefined(focus) && focus) {
@@ -143,6 +145,7 @@ angular.module('vd.directive.advanced_select', [])
 				};
 
 				scope.DropDownOpened = function() {
+
 					element.find('input').focus();
 					if (element.offset().top + element.outerHeight() + element.find('.advanced-select-drop').outerHeight() 
 							<= $(window).scrollTop() + document.documentElement.clientHeight) {
@@ -192,9 +195,9 @@ angular.module('vd.directive.advanced_select', [])
 			template: 
 			'<div class="advanced-select-container" ng-class="{ \'advanced-select-dropdown-open\': dropDownOpen, \'disabled\': disabled }">'+
 				'<ul class="advanced-select-choices" ng-click="dropDownOpen=(!disabled && !dropDownOpen)">'+
-					'<li ng-repeat="choice in selected">'+
-						'<div ng-bind="choice.label"></div>'+
-						'<a href="javascript:void(0)" ng-click="unselect(choice, $index, $event)" tabindex="-1"></a>'+
+					'<li advanced-select-option ng-repeat="item in selected">'+
+						'<div ng-bind="item.label"></div>'+
+						'<a href="javascript:void(0)" ng-click="unselect(item, $index, $event)" tabindex="-1"></a>'+
 					'</li>'+
 					'<li class="search">'+
 						'<input type="text" autocomplete="off" autocorrect="off" tabIndex="tabIndex" ng-change="dropDownOpen=(!disabled)" ng-model="search" placeholder="{{ getPlaceholder() }}" />'+
@@ -202,7 +205,7 @@ angular.module('vd.directive.advanced_select', [])
 				'</ul>'+
 				'<div class="advanced-select-drop" ng-show="dropDownOpen">'+
 					'<ul class="results">'+
-						'<li class="advanced-select-result advanced-select-result-selectable" ng-repeat="item in options | exclude:selected:valueFn | filter:search"  ng-class="{ \'with-children\': item.children.length > 0 }">'+
+						'<li advanced-select-option class="advanced-select-result advanced-select-result-selectable" ng-repeat="item in options | exclude:selected:valueFn | filter:search"  ng-class="{ \'with-children\': item.children.length > 0 }">'+
 							'<div advanced-select-item '+
 							     'class="label" '+
 							     'ng-bind="item.label" ' + 
@@ -211,12 +214,12 @@ angular.module('vd.directive.advanced_select', [])
 							     'ng-mouseover="highlight(item, this)">'+
 							'</div>'+
 							'<ul>'+
-								'<li class="advanced-select-result" ng-repeat="sub in item.children"  ng-class="{ \'advanced-select-highlighted\': sub.highlighted == true }">'+
+								'<li advanced-select-option class="advanced-select-result" ng-repeat="item in item.children"  ng-class="{ \'advanced-select-highlighted\': item.highlighted == true }">'+
 									'<div class="label" '+
-									     'ng-bind="sub.label" '+
-									     'ng-click="select(sub, true, true)" '+
-									     'ng-class="{ \'advanced-select-highlighted\': sub.highlighted == true }" '+
-									     'ng-mouseover="highlight(sub)">'+
+									     'ng-bind="item.label" '+
+									     'ng-click="select(item, true, true)" '+
+									     'ng-class="{ \'advanced-select-highlighted\': item.itemhighlighted == true }" '+
+									     'ng-mouseover="highlight(item)">'+
 									'</div>'+
 								'</li>'+
 							'</ul>'+
@@ -263,7 +266,7 @@ angular.module('vd.directive.advanced_select', [])
 						'<input type="text" ng-model="search" autocomplete="off" class="advanced-select-input" tabindex="-1" />'+
 					'</div>'+
 					'<ul class="results">'+
-						'<li class="advanced-select-result advanced-select-result-selectable" ng-repeat="item in options | filter:search"  ng-class="{ \'with-children\': item.children.length > 0 }">'+
+						'<li advanced-select-option class="advanced-select-result advanced-select-result-selectable" ng-repeat="item in options | filter:search"  ng-class="{ \'with-children\': item.children.length > 0 }">'+
 							'<div advanced-select-item '+
 							     'class="label" '+
 							     'ng-bind="item.label" ' + 
@@ -272,12 +275,12 @@ angular.module('vd.directive.advanced_select', [])
 							     'ng-mouseover="highlight(item, this)">'+
 							'</div>'+
 							'<ul>'+
-								'<li class="advanced-select-result" ng-repeat="sub in item.children"  ng-class="{ \'advanced-select-highlighted\': sub.highlighted == true }">'+
+								'<li advanced-select-option class="advanced-select-result" ng-repeat="item in item.children"  ng-class="{ \'advanced-select-highlighted\': item.highlighted == true }">'+
 									'<div class="label" '+
-									     'ng-bind="sub.label" '+
-									     'ng-click="select(sub, true, true)" '+
-									     'ng-class="{ \'advanced-select-highlighted\': sub.highlighted == true }" '+
-									     'ng-mouseover="highlight(sub)">'+
+									     'ng-bind="item.label" '+
+									     'ng-click="select(item, true, true)" '+
+									     'ng-class="{ \'advanced-select-highlighted\': item.highlighted == true }" '+
+									     'ng-mouseover="highlight(item)">'+
 									'</div>'+
 								'</li>'+
 							'</ul>'+
@@ -285,7 +288,7 @@ angular.module('vd.directive.advanced_select', [])
 					'</ul>'+
 				'</div>'+
 			'</div>'
-		}
+		};
 	})
 	.directive('advancedSelect', function($parse, $filter) {
 		                       //0000111110000000000022220000000000000000000000333300000000000000444444444444444440000000005555555555555555500000006666666666666666600000000000000077770
@@ -293,7 +296,7 @@ angular.module('vd.directive.advanced_select', [])
 
 		return {
 			restrict: 'E',
-			require: '^ngModel',
+			require: 'ngModel',
 			scope: true,
 			controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
 				// The list of options
@@ -328,7 +331,7 @@ angular.module('vd.directive.advanced_select', [])
 					}
 
 					// Highlight the given option
-					option.highlighted = true,
+					option.highlighted = true;
 					$scope.highlighted = option;
 				};
 
@@ -519,6 +522,9 @@ angular.module('vd.directive.advanced_select', [])
 				};
 
 				scope.DropDownOpened = function() {
+					if (scope.selected) {
+						scope.highlight(scope.selected);
+					}
 					element.find('input').focus();
 					if (element.offset().top + element.outerHeight() + element.find('.advanced-select-drop').outerHeight() 
 							<= $(window).scrollTop() + document.documentElement.clientHeight) {
@@ -539,6 +545,10 @@ angular.module('vd.directive.advanced_select', [])
 
 						if (!scope.hasHighlighted()) {
 							scope.highlightFirst();
+						}
+
+						if (scope.highlighted) {
+							scope.highlighted.makeVisible('middle');
 						}
 						
 					} else {
@@ -662,5 +672,38 @@ angular.module('vd.directive.advanced_select', [])
 					});
 				}
 			}
-		}
+		};
+	})
+	.directive('advancedSelectOption', function() {
+		return {
+			restrict: 'A',
+			require: '^advancedSelect',
+			scope: true,
+			link: function(scope, element) {
+				scope.$parent.item.makeVisible = function(position) {
+					var position = angular.isDefined(position) ? position : 'none';
+					var top = 0;
+
+					if (element.position().top < 0) {
+						top = element.parent().scrollTop() + element.position().top;
+						if (position == 'middle') {
+							top -= (element.parent().height()/2.0 - element.outerHeight()/2.0);
+						}
+						element.parent().scrollTop(top);
+					} else if (element.position().top + element.outerHeight() > element.parent().height()) {
+						top = element.parent().scrollTop() + (element.position().top + element.outerHeight() - element.parent().height());
+						if (position == 'middle') {
+							top += (element.parent().height()/2.0 + element.outerHeight()/2.0);
+						}
+						element.parent().scrollTop(top);
+					}
+				};
+
+				scope.$watch('item.highlighted', function(highlighted) {
+					if (highlighted) {
+						scope.item.makeVisible();
+					}
+				});
+			}
+		};
 	});

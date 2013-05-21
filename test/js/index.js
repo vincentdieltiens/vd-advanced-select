@@ -42,7 +42,7 @@ angular.module('app', ['directive.tabs', 'vd.directive.advanced_select'])
 		];
 	})
 	.controller('example6', function($scope, $timeout) {
-		$scope.year = null;
+		$scope.year = 1956;
 		$scope.years = [];
 		for(var i=1940; i < 2013; i++) {
 			$scope.years.push(i);
