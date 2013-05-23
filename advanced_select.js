@@ -48,6 +48,9 @@ angular.module('vd.directive.advanced_select', [])
 				// The list of options
 				$scope.options = [];
 
+				// The lift of filtered options (for performance)
+				$scope.filteredOptions = [];
+
 				// Is the DropDown open or not ?
 				$scope.dropDownOpen = false;
 
@@ -66,12 +69,17 @@ angular.module('vd.directive.advanced_select', [])
 				// The model of the search box
 				$scope.search = '';
 
+				$scope.setFilteredOptions = function() {
+					$scope.filteredOptions = $filter('filter')($scope.options, $scope.search);
+				}
+
 				/**
 				 * Get the filtered options
 				 * @return the filtered options
 				 */
 				$scope.getFilteredOptions = function() {
-					return $filter('filter')($scope.options, $scope.search);
+					return $scope.filteredOptions;
+					//return $filter('filter')($scope.options, $scope.search);
 				}
 
 				/**
@@ -79,6 +87,9 @@ angular.module('vd.directive.advanced_select', [])
 				 * @param option : the option to highlight
 				 */
 				$scope.highlight = function(option) {
+					if (!option) {
+						return;
+					}
 					// Unhighlight the previous highlighted option, if exists
 					if ($scope.highlighted) {
 						$scope.highlighted.highlighted = false;
@@ -344,6 +355,11 @@ angular.module('vd.directive.advanced_select', [])
 					}
 				}, true);
 
+				scope.$watch('search.label', function() {
+					console.log('search label changed');
+					scope.setFilteredOptions();
+				});
+
 				function handleMouseWhenDropDownOpened(e) {
 					var container = angular.element(e.target).parents('.advanced-select-container');
 					if (container.length == 0 || container[0] != element.get(0)) {
@@ -422,7 +438,6 @@ angular.module('vd.directive.advanced_select', [])
 									children: subitems
 								});
 							});
-
 						} else {
 							scope.options = [];
 							angular.forEach(items, function(item) {
@@ -434,6 +449,9 @@ angular.module('vd.directive.advanced_select', [])
 							});
 							
 						}
+
+						console.log('ok...');
+						scope.setFilteredOptions();
 						
 						if ((modelValue = getNgModel(scope)) != null) {
 							scope.updateSelection(modelValue);
@@ -454,6 +472,7 @@ angular.module('vd.directive.advanced_select', [])
 							label: option.html()
 						});
 					});
+					scope.setFilteredOptions();
 				}
 			}
 		};
@@ -502,10 +521,10 @@ angular.module('vd.directive.advanced_select', [])
 				'</a>'+
 				'<div class="advanced-select-drop" ng-show="dropDownOpen">'+
 					'<div class="search">'+
-						'<input type="text" ng-model="search" autocomplete="off" class="advanced-select-input" tabindex="-1" />'+
+						'<input type="text" ng-model="search.label" autocomplete="off" class="advanced-select-input" tabindex="-1" />'+
 					'</div>'+
 					'<ul class="results">'+
-						'<li advanced-select-option class="advanced-select-result advanced-select-result-selectable" ng-repeat="item in options | filter:search"  ng-class="{ \'with-children\': item.children.length > 0 }">'+
+						'<li advanced-select-option class="advanced-select-result advanced-select-result-selectable" ng-repeat="item in filteredOptions"  ng-class="{ \'with-children\': item.children.length > 0 }">'+
 							'<div advanced-select-item '+
 							     'class="label" '+
 							     'ng-bind="item.label" ' + 
@@ -560,11 +579,19 @@ angular.module('vd.directive.advanced_select', [])
 				};
 
 				/**
+				 * Update the filtered options
+				 */
+				$scope.setFilteredOptions = function() {
+					$scope.filteredOptions = $filter('filter')($filter('exclude')($scope.options, $scope.selected), $scope.search);
+					console.log('set filteded....', $scope.filteredOptions)
+				}
+
+				/**
 				 * Get the filtered options
 				 * @return the filtered options
 				 */
 				$scope.getFilteredOptions = function() {
-					return $filter('filter')($filter('exclude')($scope.options, $scope.selected), $scope.search);
+					return $scope.filteredOptions;
 				}
 			},
 			link: function(scope, element, attrs) {
@@ -576,6 +603,10 @@ angular.module('vd.directive.advanced_select', [])
 					element.addClass('focus')
 				}).bind('blur', function(e) {
 					element.removeClass('focus');
+				});
+
+				scope.$watch('selected.length', function() {
+					scope.setFilteredOptions();
 				});
 
 				// Adjust the size of the input to take the available space
@@ -679,6 +710,7 @@ angular.module('vd.directive.advanced_select', [])
 				 */
 				scope.unselect = function(index, e) {
 					if (e) {
+						console.log('===>', e)
 						e.preventDefault();
 						e.stopPropagation();
 					}
@@ -722,15 +754,15 @@ angular.module('vd.directive.advanced_select', [])
 				'<ul class="advanced-select-choices" ng-click="dropDownOpen=(!disabled && !dropDownOpen)">'+
 					'<li advanced-select-option ng-repeat="item in selected">'+
 						'<div ng-bind="item.label"></div>'+
-						'<a href="javascript:void(0)" ng-click="unselect(item, $index, $event)" tabindex="-1"></a>'+
+						'<a href="javascript:void(0)" ng-click="unselect($index, $event)" tabindex="-1"></a>'+
 					'</li>'+
 					'<li class="search">'+
-						'<input type="text" autocomplete="off" autocorrect="off" tabIndex="tabIndex" ng-change="dropDownOpen=(!disabled)" ng-model="search" placeholder="{{ getPlaceholder() }}" />'+
+						'<input type="text" autocomplete="off" autocorrect="off" tabIndex="tabIndex" ng-change="dropDownOpen=(!disabled)" ng-model="search.label" placeholder="{{ getPlaceholder() }}" />'+
 					'</li>'+
 				'</ul>'+
 				'<div class="advanced-select-drop" ng-show="dropDownOpen">'+
 					'<ul class="results">'+
-						'<li advanced-select-option class="advanced-select-result advanced-select-result-selectable" ng-repeat="item in options | exclude:selected | filter:search"  ng-class="{ \'with-children\': item.children.length > 0 }">'+
+						'<li advanced-select-option class="advanced-select-result advanced-select-result-selectable" ng-repeat="item in filteredOptions"  ng-class="{ \'with-children\': item.children.length > 0 }">'+
 							'<div advanced-select-item '+
 							     'class="label" '+
 							     'ng-bind="item.label" ' + 
@@ -802,7 +834,7 @@ angular.module('vd.directive.advanced_select', [])
 		 * @param excluded : the sub list of options to remove
 		 */
 		return function(options, excluded) {
-			return options.filter(function(element, index, array) {
+			var o = options.filter(function(element, index, array) {
 				for(var i=0, n=excluded.length; i < n; i++) {
 					if (element.value == excluded[i].value) {
 						return false;
@@ -810,5 +842,6 @@ angular.module('vd.directive.advanced_select', [])
 				}
 				return true;
 			});
+			return o;
 		}
 	});
