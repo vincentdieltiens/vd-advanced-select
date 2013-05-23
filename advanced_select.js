@@ -118,6 +118,7 @@ angular.module('vd.directive.advanced_select', [])
 					// Update the model
 					if (angular.isUndefined(updateModel) || updateModel) {
 						var m = scope.getNgModel(scope);
+						console.log('m : ', m)
 						pushOnce(m, scope.valueFn(item.target));
 						scope.setNgModel(scope, m);
 					}
