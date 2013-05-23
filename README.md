@@ -20,7 +20,14 @@ You can see working examples at [http://vincentdieltiens.github.com/advanced-sel
 Brower Compatibility
 --------------------
 
-I'm mostly using Chrome and Firefox (the latest versions). Tell me if you find bugs
+I'm mostly using Chrome and Firefox (the latest versions). I've tried on :
+
+- Google Chrome >= 26.0.1410 (Mac OS X)
+- Mozilla Firefox >= 21.0 (Max OS X)
+- Opera >= 12.15 (Mac OS X)
+- Safari >= 5.1.7 (Mac OS X)
+
+Note : As Advanced select is a `<a>` (or `input`), you have to activate the keyboard navigation on Mac OS X (see http://www.456bereastreet.com/archive/200906/enabling_keyboard_navigation_in_mac_os_x_web_browsers/) to naviguate using the `tab` key.
 
 Found a bug ?
 -------------
