@@ -24,6 +24,10 @@ angular.module('vd.directive.advanced_select', [])
 					el.attr('placeholder', attrs.placeholder);
 				}
 
+				if (angular.isDefined(attrs.tabindex)) {
+					el.attr('tabindex', attrs.tabindex);
+				}
+
 				// Hide the select, add the Advanced Select to the DOM and compile it
 				select.css('display', 'none');
 				select.after(el);
@@ -484,6 +488,11 @@ angular.module('vd.directive.advanced_select', [])
 					fillInResultsFromNgOptions();
 				} else {
 					fillInResultsFromSelect();
+				}
+
+				if (attrs.tabindex) {
+					element.attr('tabindex', -1);
+					scope.tabIndex = attrs.tabindex;
 				}
 
 				scope.setNgModel = setNgModel;
