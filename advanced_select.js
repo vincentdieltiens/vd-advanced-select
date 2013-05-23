@@ -118,7 +118,6 @@ angular.module('vd.directive.advanced_select', [])
 					// Update the model
 					if (angular.isUndefined(updateModel) || updateModel) {
 						var m = scope.getNgModel(scope);
-						console.log('m : ', m)
 						pushOnce(m, scope.valueFn(item.target));
 						scope.setNgModel(scope, m);
 					}
@@ -193,7 +192,6 @@ angular.module('vd.directive.advanced_select', [])
 						var width = element.find('.advanced-select-choices').width() - (lastSelected.offset().left + lastSelected.outerWidth());
 						element.find('.search').width(width);
 					} else {
-						console.log('--->>>>>', element.find('.advanced-select-choices').innerWidth())
 						element.find('.search').width(element.find('.advanced-select-choices').innerWidth());
 					}
 				}
