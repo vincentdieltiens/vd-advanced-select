@@ -1,20 +1,18 @@
 angular.module('vd.directive.advanced_select', [])
+	/**
+	 * Directive that transform a regular <select> element into an advanced select
+	 */
 	.directive('advanced', function($compile) {
 		return {
 			restrict: 'A',
-			require: 'ngModel',
-			controller: function() {
-
-			},
+			require: ['select', 'ngModel'],
 			link: function(scope, select, attrs) {
-
 				// Creates the Advanced Select using the second directive
 				var el;
-
 				if (attrs.multiple) {
-					var el = angular.element('<advanced-select advanced-select-multiple class="'+attrs.class+'" ng-model="'+attrs.ngModel+'" options="'+attrs.ngOptions+'"></advanced-select>');
+					el = angular.element('<advanced-select advanced-select-multiple class="'+attrs.class+'" ng-model="'+attrs.ngModel+'" options="'+attrs.ngOptions+'"></advanced-select>');
 				} else {
-					var el = angular.element('<advanced-select advanced-select-simple class="'+attrs.class+'" ng-model="'+attrs.ngModel+'" options="'+attrs.ngOptions+'"></advanced-select>');
+					el = angular.element('<advanced-select advanced-select-simple class="'+attrs.class+'" ng-model="'+attrs.ngModel+'" options="'+attrs.ngOptions+'"></advanced-select>');
 				}
 				
 				if (angular.isDefined(attrs.disabled)) {
@@ -35,248 +33,9 @@ angular.module('vd.directive.advanced_select', [])
 			}
 		};
 	})
-	.filter('exclude', function() {
-		return function(list, excludes) {
-			return list.filter(function(element, index, array) {
-				for(var i=0, n=excludes.length; i < n; i++) {
-					if (element.value == excludes[i].value) {
-						return false;
-					}
-				}
-				return true;
-			});
-		}
-	})
-	.directive('advancedSelectMultiple', function($parse, $filter, $timeout) {
-		return {
-			restrict: 'A',
-			require: 'advancedSelect',
-			replace: true,
-			scope: true,
-			link: function(scope, element, attrs) {
-				scope.selected = [];
-
-				element.find('input').bind('focus', function(e) {
-					element.addClass('focus')
-				}).bind('blur', function(e) {
-					element.removeClass('focus');
-				});
-
-				element.find('input').bind('keydown.advanced_select_multiple', handleKeys);
-
-				$timeout(function() {
-					adjustSearchInputWidth();
-				});
-
-				function handleKeys(e) {
-					switch(e.keyCode) {
-						case 8: // Backspace
-							if (scope.search == '') {
-								scope.unselectLast(e);
-								scope.$apply();
-							}
-							break;
-					}
-				} 
-
-				function exists(array, newValue) {
-					for(var i=0, n=array.length; i < n; i++) {
-						var value = array[i];
-						if (array[i] == newValue) {
-							return true;
-						}
-					}
-				}
-
-				function pushOnce(array, newValue) {
-					if (!exists(array, newValue)) {
-						array.push(newValue);
-					}
-				}
-
-				scope.select = function(item, updateModel, focus) {
-					pushOnce(scope.selected, item);
-					
-					// Set the focus
-					if (angular.isDefined(focus) && focus) {
-						element.find('.advanced-select-choices').focus();
-					}
-					
-					// Update the model
-					if (angular.isUndefined(updateModel) || updateModel) {
-						var m = scope.getNgModel(scope);
-						pushOnce(m, item.value);
-						scope.setNgModel(scope, m);
-					}
-
-					$timeout(function() {
-						adjustSearchInputWidth();
-					});
-					
-					// Hide the drop down
-					scope.dropDownOpen = false;
-				};
-
-				scope.updateSelection = function(ngModel, results) {
-					var results = angular.isDefined(results) ? results : $filter('filter')(scope.options, scope.search);
-					for(var i=0, n = results.length; i < n; i++) {
-						var r = results[i];
-						for(var j=0, m=ngModel.length; j < m; j++) {
-							if (r.value == ngModel[j]) {
-								scope.select(r, false, false);
-							}
-						}
-						if (r.children) {
-							scope.updateSelection(ngModel, r.children);
-						}
-					}
-				};
-
-				scope.DropDownOpened = function() {
-					element.find('input').focus();
-					if (element.offset().top + element.outerHeight() + element.find('.advanced-select-drop').outerHeight() 
-							<= $(window).scrollTop() + document.documentElement.clientHeight) {
-						element.removeClass('top');
-					} else {
-						element.addClass('top');
-					}
-				};
-
-				scope.unselectLast = function(e) {
-					scope.unselect(null, scope.selected.length-1, e)
-				};
-
-				scope.unselect = function(choice, index, e) {
-					if (e) {
-						e.preventDefault();
-						e.stopPropagation();
-					}
-
-					var m = scope.getNgModel(scope);
-					m.splice(index, 1);
-					scope.setNgModel(scope, m);
-
-					scope.selected.splice(index, 1);
-					scope.dropDownOpen = false;
-					element.find('input').focus();
-
-					$timeout(function() {
-						adjustSearchInputWidth();
-					});
-				};
-
-				scope.getPlaceholder = function() {
-					return scope.selected.length ? '' : scope.placeholder;
-				};
-
-				function adjustSearchInputWidth() {
-					var lastSelected = element.find('.advanced-select-choices li:not(.search)').last();
-					if (lastSelected.length) {
-						var width = element.find('.advanced-select-choices').width() - (lastSelected.offset().left + lastSelected.outerWidth());
-						element.find('.search').width(width);
-					} else {
-						element.find('.search').width(element.find('.advanced-select-choices').innerWidth());
-					}
-				}
-			},
-			template: 
-			'<div class="advanced-select-container" ng-class="{ \'advanced-select-dropdown-open\': dropDownOpen, \'disabled\': disabled }">'+
-				'<ul class="advanced-select-choices" ng-click="dropDownOpen=(!disabled && !dropDownOpen)">'+
-					'<li advanced-select-option ng-repeat="item in selected">'+
-						'<div ng-bind="item.label"></div>'+
-						'<a href="javascript:void(0)" ng-click="unselect(item, $index, $event)" tabindex="-1"></a>'+
-					'</li>'+
-					'<li class="search">'+
-						'<input type="text" autocomplete="off" autocorrect="off" tabIndex="tabIndex" ng-change="dropDownOpen=(!disabled)" ng-model="search" placeholder="{{ getPlaceholder() }}" />'+
-					'</li>'+
-				'</ul>'+
-				'<div class="advanced-select-drop" ng-show="dropDownOpen">'+
-					'<ul class="results">'+
-						'<li advanced-select-option class="advanced-select-result advanced-select-result-selectable" ng-repeat="item in options | exclude:selected | filter:search"  ng-class="{ \'with-children\': item.children.length > 0 }">'+
-							'<div advanced-select-item '+
-							     'class="label" '+
-							     'ng-bind="item.label" ' + 
-							     'ng-class="{ \'advanced-select-highlighted\': item.highlighted == true }" '+ 
-							     'ng-click="select(item, true, true)" '+
-							     'ng-mouseover="highlight(item, this)">'+
-							'</div>'+
-							'<ul>'+
-								'<li advanced-select-option class="advanced-select-result" ng-repeat="item in item.children"  ng-class="{ \'advanced-select-highlighted\': item.highlighted == true }">'+
-									'<div class="label" '+
-									     'ng-bind="item.label" '+
-									     'ng-click="select(item, true, true)" '+
-									     'ng-class="{ \'advanced-select-highlighted\': item.itemhighlighted == true }" '+
-									     'ng-mouseover="highlight(item)">'+
-									'</div>'+
-								'</li>'+
-							'</ul>'+
-						'</li>'+
-					'</ul>'+
-				'</div>'+
-			'</div>'
-		};
-	})
-	.directive('advancedSelectSimple', function($parse, $filter) {
-		return {
-			restrict: 'A',
-			require: 'advancedSelect',
-			scope: true,
-			link: function(scope, element, attrs) {
-				scope.select = function(item, updateModel, focus) {
-					scope.selected = item;
-					scope.highlight(item);
-
-					// Set the focus
-					if (angular.isDefined(focus) && focus) {
-						element.find('a').focus();
-					}
-					
-					// Update the model
-					if (angular.isUndefined(updateModel) || updateModel) {
-						scope.setNgModel(scope, item.value);
-					}
-
-					// Hide the drop down
-					scope.dropDownOpen = false;
-				};
-			},
-			replace: true,
-			template: 
-			'<div class="advanced-select-container" ng-class="{ \'advanced-select-dropdown-open\': dropDownOpen, \'disabled\': disabled }">'+
-				'<a href="javascript:void(0)" ng-click="dropDownOpen=(!disabled && !dropDownOpen)" class="advanced-select-choice" tabindex="tabIndex">'+
-					'<span ng-bind="selected.label || placeholder" ng-class="{ \'placeholder\': selected == null }"></span>'+
-						'<abbr class="advanced-select-search-choice-close" style="display: none;"></abbr>'+
-						'<div class="arrow"><b></b></div>'+
-				'</a>'+
-				'<div class="advanced-select-drop" ng-show="dropDownOpen">'+
-					'<div class="search">'+
-						'<input type="text" ng-model="search" autocomplete="off" class="advanced-select-input" tabindex="-1" />'+
-					'</div>'+
-					'<ul class="results">'+
-						'<li advanced-select-option class="advanced-select-result advanced-select-result-selectable" ng-repeat="item in options | filter:search"  ng-class="{ \'with-children\': item.children.length > 0 }">'+
-							'<div advanced-select-item '+
-							     'class="label" '+
-							     'ng-bind="item.label" ' + 
-							     'ng-class="{ \'advanced-select-highlighted\': item.highlighted == true }" '+ 
-							     'ng-click="select(item, true, true)" '+
-							     'ng-mouseover="highlight(item, this)">'+
-							'</div>'+
-							'<ul>'+
-								'<li advanced-select-option class="advanced-select-result" ng-repeat="item in item.children"  ng-class="{ \'advanced-select-highlighted\': item.highlighted == true }">'+
-									'<div class="label" '+
-									     'ng-bind="item.label" '+
-									     'ng-click="select(item, true, true)" '+
-									     'ng-class="{ \'advanced-select-highlighted\': item.highlighted == true }" '+
-									     'ng-mouseover="highlight(item)">'+
-									'</div>'+
-								'</li>'+
-							'</ul>'+
-						'</li>'+
-					'</ul>'+
-				'</div>'+
-			'</div>'
-		};
-	})
+	/**
+	 * Base directive for creating an advanced select
+	 */
 	.directive('advancedSelect', function($parse, $filter) {
 		                       //0000111110000000000022220000000000000000000000333300000000000000444444444444444440000000005555555555555555500000006666666666666666600000000000000077770
 		var NG_OPTIONS_REGEXP = /^\s*(.*?)(?:\s+as\s+(.*?))?(?:\s+group\s+by\s+(.*))?\s+for\s+(?:([\$\w][\$\w\d]*)|(?:\(\s*([\$\w][\$\w\d]*)\s*,\s*([\$\w][\$\w\d]*)\s*\)))\s+in\s+(.*)$/;
@@ -308,6 +67,14 @@ angular.module('vd.directive.advanced_select', [])
 				$scope.search = '';
 
 				/**
+				 * Get the filtered options
+				 * @return the filtered options
+				 */
+				$scope.getFilteredOptions = function() {
+					return $filter('filter')($scope.options, $scope.search);
+				}
+
+				/**
 				 * Highlight the given option
 				 * @param option : the option to highlight
 				 */
@@ -331,7 +98,7 @@ angular.module('vd.directive.advanced_select', [])
 				 */
 				$scope.highlightPrevious = function(options, highlightPrevious) {
 					if (angular.isUndefined(options) || options == null) {
-						options = $filter('filter')($scope.options, $scope.search);
+						options = $scope.getFilteredOptions();
 					}
 
 					var res = {
@@ -341,7 +108,6 @@ angular.module('vd.directive.advanced_select', [])
 
 					for(var i=options.length-1; i >= 0; i--) {
 						var r = options[i];
-
 						if (r.children) {
 							res = $scope.highlightPrevious(r.children, res.highlightPrevious);
 							if (res.jobDone) {
@@ -377,7 +143,7 @@ angular.module('vd.directive.advanced_select', [])
 					// the loop with res.jobDone = true
 
 					if (angular.isUndefined(options) || options == null) {
-						options = $filter('filter')($scope.options, $scope.search);
+						options = $scope.getFilteredOptions();
 					}
 
 					var res = {
@@ -415,7 +181,7 @@ angular.module('vd.directive.advanced_select', [])
 				 */
 				$scope.highlightFirst = function(options) {
 					if (angular.isUndefined(options) || options == null) {
-						options = $filter('filter')($scope.options, $scope.search);
+						options = $scope.getFilteredOptions();
 					}
 					$scope.highlight(options[0]);
 				}
@@ -427,7 +193,7 @@ angular.module('vd.directive.advanced_select', [])
 				 */
 				$scope.highlightLast = function(options) {
 					if (angular.isUndefined(options) || options == null) {
-						options = $filter('filter')($scope.options, $scope.search);
+						options = $scope.getFilteredOptions();
 					}
 					$scope.highlight(options[options.length-1]);
 				}
@@ -443,7 +209,7 @@ angular.module('vd.directive.advanced_select', [])
 						return false;
 					}
 					if (angular.isUndefined(options) || options == null) {
-						options = $filter('filter')($scope.options, $scope.search);
+						options = $scope.getFilteredOptions();
 					}
 					for(var i=0, n = options.length; i < n; i++) {
 						var r = options[i];
@@ -458,17 +224,38 @@ angular.module('vd.directive.advanced_select', [])
 					}
 					return false;
 				};
+
+				/**
+				 * Update the label of the select according to the model
+				 * @param ngModel : the model to use to update the label
+				 * @param options : the list of options
+				 */
+				$scope.updateSelection = function(ngModel, options) {
+					var options = angular.isDefined(options) ? options : $scope.getFilteredOptions();
+					for(var i=0, n = options.length; i < n; i++) {
+						var r = options[i];
+						if (r.value == ngModel) {
+							$scope.select(r, false, false);
+							return;
+						}
+						if (r.children) {
+							$scope.updateSelection(ngModel, r.children);
+						}
+					}
+				};
 			}],
 			link: function(scope, element, attrs) {
 				// ngModel
 				var getNgModel = $parse('$parent.'+attrs.ngModel);
 				var setNgModel = getNgModel.assign;
 
+				scope.setNgModel = setNgModel;
+				scope.getNgModel = getNgModel;
+
 				var labelFn = $parse("label"),
 				    item = "item",
 				    optionsModel = null,
 				    groupBy = null,
-				    objects = []
 				    value = [];
 
 				if (attrs.options) {
@@ -495,28 +282,21 @@ angular.module('vd.directive.advanced_select', [])
 					scope.tabIndex = attrs.tabindex;
 				}
 
-				scope.setNgModel = setNgModel;
-				scope.getNgModel = getNgModel;
-
-				scope.updateSelection = function(ngModel, results) {
-					var results = angular.isDefined(results) ? results : $filter('filter')(scope.options, scope.search);
-					for(var i=0, n = results.length; i < n; i++) {
-						var r = results[i];
-						if (r.value == ngModel) {
-							scope.select(r, false, false);
-							return;
-						}
-						if (r.children) {
-							scope.updateSelection(ngModel, r.children);
-						}
-					}
-				};
-
+				/**
+				 * Method called when the dropdown is just opened
+				 */
 				scope.DropDownOpened = function() {
+
+					// Highlight the selected option if any
 					if (scope.selected) {
 						scope.highlight(scope.selected);
 					}
+
+					// Set the focus on the input
 					element.find('input').focus();
+
+					// Adjust the position of the dropdown according to the available space
+					// And move the search field according to the position
 					if (element.offset().top + element.outerHeight() + element.find('.advanced-select-drop').outerHeight() 
 							<= $(window).scrollTop() + document.documentElement.clientHeight) {
 						element.removeClass('top');
@@ -527,6 +307,7 @@ angular.module('vd.directive.advanced_select', [])
 					}
 				}
 
+				/* Wachtes and observes */
 				scope.$watch('dropDownOpen', function() {
 					if (scope.dropDownOpen) {
 						$(document).bind('keydown.advanced_select', handleKeysWhenDropDownOpened)
@@ -608,6 +389,12 @@ angular.module('vd.directive.advanced_select', [])
 				/**
 				 * Fill in the options list of the fakeSelect from
 				 * the models given to ng-options
+				 *
+				 * each option is an object with 3 or 4 keys :
+				 *   - target : the scope of the select option
+				 *   - label : the text to display in the list
+				 *   - value : the value used to update the model
+				 *   - children (optional) : an array of sub options 
 				 */
 				function fillInResultsFromNgOptions() {
 					scope.$watch(optionsModel, function(items) {
@@ -671,12 +458,313 @@ angular.module('vd.directive.advanced_select', [])
 			}
 		};
 	})
+	/**
+	 * Directive to make an advanced select with single selection
+	 */ 
+	.directive('advancedSelectSimple', function($parse) {
+		return {
+			restrict: 'A',
+			require: 'advancedSelect',
+			scope: true,
+			link: function(scope, element, attrs) {
+				/**
+				 * Select an options (and highlight it for future) and eventually update the model
+				 * and set the focus on the select
+				 * @param option : the option to select
+				 * @param updateModel : if the method must update the model
+				 * @param focus : if the method must set the focus on the select
+				 */
+				scope.select = function(option, updateModel, focus) {
+					scope.selected = option;
+					scope.highlight(option);
+
+					// Set the focus
+					if (angular.isDefined(focus) && focus) {
+						element.find('a').focus();
+					}
+					
+					// Update the model
+					if (angular.isUndefined(updateModel) || updateModel) {
+						scope.setNgModel(scope, option.value);
+					}
+
+					// Hide the drop down
+					scope.dropDownOpen = false;
+				};
+			},
+			replace: true,
+			template: 
+			'<div class="advanced-select-container" ng-class="{ \'advanced-select-dropdown-open\': dropDownOpen, \'disabled\': disabled }">'+
+				'<a href="javascript:void(0)" ng-click="dropDownOpen=(!disabled && !dropDownOpen)" class="advanced-select-choice" tabindex="tabIndex">'+
+					'<span ng-bind="selected.label || placeholder" ng-class="{ \'placeholder\': selected == null }"></span>'+
+						'<abbr class="advanced-select-search-choice-close" style="display: none;"></abbr>'+
+						'<div class="arrow"><b></b></div>'+
+				'</a>'+
+				'<div class="advanced-select-drop" ng-show="dropDownOpen">'+
+					'<div class="search">'+
+						'<input type="text" ng-model="search" autocomplete="off" class="advanced-select-input" tabindex="-1" />'+
+					'</div>'+
+					'<ul class="results">'+
+						'<li advanced-select-option class="advanced-select-result advanced-select-result-selectable" ng-repeat="item in options | filter:search"  ng-class="{ \'with-children\': item.children.length > 0 }">'+
+							'<div advanced-select-item '+
+							     'class="label" '+
+							     'ng-bind="item.label" ' + 
+							     'ng-class="{ \'advanced-select-highlighted\': item.highlighted == true }" '+ 
+							     'ng-click="select(item, true, true)" '+
+							     'ng-mouseover="highlight(item, this)">'+
+							'</div>'+
+							'<ul>'+
+								'<li advanced-select-option class="advanced-select-result" ng-repeat="item in item.children"  ng-class="{ \'advanced-select-highlighted\': item.highlighted == true }">'+
+									'<div class="label" '+
+									     'ng-bind="item.label" '+
+									     'ng-click="select(item, true, true)" '+
+									     'ng-class="{ \'advanced-select-highlighted\': item.highlighted == true }" '+
+									     'ng-mouseover="highlight(item)">'+
+									'</div>'+
+								'</li>'+
+							'</ul>'+
+						'</li>'+
+					'</ul>'+
+				'</div>'+
+			'</div>'
+		};
+	})
+	/**
+	 * Directive to make an advanced select with multiple selection
+	 */
+	.directive('advancedSelectMultiple', function($parse, $filter, $timeout) {
+		return {
+			restrict: 'A',
+			require: 'advancedSelect',
+			replace: true,
+			scope: true,
+			controller: function($scope) {
+				/**
+				 * Update the label of the select according to the model
+				 * @param ngModel : the model to use to update the label
+				 * @param options : the list of options
+				 */
+				$scope.updateSelection = function(ngModel, options) {
+					var options = angular.isDefined(options) ? options : $scope.getFilteredOptions();
+					for(var i=0, n = options.length; i < n; i++) {
+						var r = options[i];
+						for(var j=0, m=ngModel.length; j < m; j++) {
+							if (r.value == ngModel[j]) {
+								$scope.select(r, false, false);
+							}
+						}
+						if (r.children) {
+							$scope.updateSelection(ngModel, r.children);
+						}
+					}
+				};
+
+				/**
+				 * Get the filtered options
+				 * @return the filtered options
+				 */
+				$scope.getFilteredOptions = function() {
+					return $filter('filter')($filter('exclude')($scope.options, $scope.selected), $scope.search);
+				}
+			},
+			link: function(scope, element, attrs) {
+				// There may be more than one selected value
+				scope.selected = [];
+
+				// Add a specific class on the main container when the input has the focus
+				element.find('input').bind('focus', function(e) {
+					element.addClass('focus')
+				}).bind('blur', function(e) {
+					element.removeClass('focus');
+				});
+
+				// Adjust the size of the input to take the available space
+				$timeout(function() {
+					adjustSearchInputWidth();
+				});
+
+				element.find('input').bind('keydown.advanced_select_multiple', handleKeys);
+				function handleKeys(e) {
+					switch(e.keyCode) {
+						case 8: // Backspace
+							if (scope.search == '') {
+								scope.unselectLast(e);
+								scope.$apply();
+							}
+							break;
+					}
+				} 
+
+				/**
+				 * check if a value exists in a given array
+				 * @param array : the array
+				 * @param value : the value to search in the array
+				 */
+				function exists(array, value) {
+					for(var i=0, n=array.length; i < n; i++) {
+						if (array[i] == value) {
+							return true;
+						}
+					}
+				}
+
+				/**
+				 * Push a value in the array if the value is not already in it
+				 * @param array : the array
+				 * @param value : the value to add
+				 */
+				function pushOnce(array, value) {
+					if (!exists(array, value)) {
+						array.push(value);
+					}
+				}
+
+				/**
+				 * Select a value by adding it in the array
+				 * @param option : the option to select
+				 * @param updateModel : if the method must update the model
+				 * @param focus : if the method must set the focus on the select
+				 */
+				scope.select = function(option, updateModel, focus) {
+					pushOnce(scope.selected, option);
+					
+					// Set the focus
+					if (angular.isDefined(focus) && focus) {
+						element.find('.advanced-select-choices').focus();
+					}
+					
+					// Update the model
+					if (angular.isUndefined(updateModel) || updateModel) {
+						var m = scope.getNgModel(scope);
+						pushOnce(m, option.value);
+						scope.setNgModel(scope, m);
+					}
+
+					$timeout(function() {
+						adjustSearchInputWidth();
+					});
+					
+					// Hide the drop down
+					scope.dropDownOpen = false;
+				};
+
+				/**
+				 * Method called when dropdown is just opened
+				 */
+				scope.DropDownOpened = function() {
+					//
+					element.find('input').focus();
+
+					// Adjust the position of the dropdown according to the available space
+					if (element.offset().top + element.outerHeight() + element.find('.advanced-select-drop').outerHeight() 
+							<= $(window).scrollTop() + document.documentElement.clientHeight) {
+						element.removeClass('top');
+					} else {
+						element.addClass('top');
+					}
+				};
+
+				/**
+				 * Unselect the last value
+				 * @param e : the source event if any
+				 */
+				scope.unselectLast = function(e) {
+					scope.unselect( scope.selected.length-1, e)
+				};
+
+				/**
+				 * Unselect the choice at a given index
+				 * @param index : the index of the item to unselect
+				 * @param e : the source event if any
+				 */
+				scope.unselect = function(index, e) {
+					if (e) {
+						e.preventDefault();
+						e.stopPropagation();
+					}
+
+					var m = scope.getNgModel(scope);
+					m.splice(index, 1);
+					scope.setNgModel(scope, m);
+
+					scope.selected.splice(index, 1);
+					scope.dropDownOpen = false;
+
+					element.find('input').focus();
+
+					$timeout(function() {
+						adjustSearchInputWidth();
+					});
+				};
+
+				/**
+				 * Get the placeholder value (empty if there is at least a selected value)
+				 */
+				scope.getPlaceholder = function() {
+					return scope.selected.length ? '' : scope.placeholder;
+				};
+
+				/**
+				 * Adjust the size of the search input according to the available space
+				 */
+				function adjustSearchInputWidth() {
+					var lastSelected = element.find('.advanced-select-choices li:not(.search)').last();
+					if (lastSelected.length) {
+						var width = element.find('.advanced-select-choices').width() - (lastSelected.offset().left + lastSelected.outerWidth());
+						element.find('.search').width(width);
+					} else {
+						element.find('.search').width(element.find('.advanced-select-choices').innerWidth());
+					}
+				}
+			},
+			template: 
+			'<div class="advanced-select-container" ng-class="{ \'advanced-select-dropdown-open\': dropDownOpen, \'disabled\': disabled }">'+
+				'<ul class="advanced-select-choices" ng-click="dropDownOpen=(!disabled && !dropDownOpen)">'+
+					'<li advanced-select-option ng-repeat="item in selected">'+
+						'<div ng-bind="item.label"></div>'+
+						'<a href="javascript:void(0)" ng-click="unselect(item, $index, $event)" tabindex="-1"></a>'+
+					'</li>'+
+					'<li class="search">'+
+						'<input type="text" autocomplete="off" autocorrect="off" tabIndex="tabIndex" ng-change="dropDownOpen=(!disabled)" ng-model="search" placeholder="{{ getPlaceholder() }}" />'+
+					'</li>'+
+				'</ul>'+
+				'<div class="advanced-select-drop" ng-show="dropDownOpen">'+
+					'<ul class="results">'+
+						'<li advanced-select-option class="advanced-select-result advanced-select-result-selectable" ng-repeat="item in options | exclude:selected | filter:search"  ng-class="{ \'with-children\': item.children.length > 0 }">'+
+							'<div advanced-select-item '+
+							     'class="label" '+
+							     'ng-bind="item.label" ' + 
+							     'ng-class="{ \'advanced-select-highlighted\': item.highlighted == true }" '+ 
+							     'ng-click="select(item, true, true)" '+
+							     'ng-mouseover="highlight(item, this)">'+
+							'</div>'+
+							'<ul>'+
+								'<li advanced-select-option class="advanced-select-result" ng-repeat="item in item.children"  ng-class="{ \'advanced-select-highlighted\': item.highlighted == true }">'+
+									'<div class="label" '+
+									     'ng-bind="item.label" '+
+									     'ng-click="select(item, true, true)" '+
+									     'ng-class="{ \'advanced-select-highlighted\': item.itemhighlighted == true }" '+
+									     'ng-mouseover="highlight(item)">'+
+									'</div>'+
+								'</li>'+
+							'</ul>'+
+						'</li>'+
+					'</ul>'+
+				'</div>'+
+			'</div>'
+		};
+	})
 	.directive('advancedSelectOption', function() {
 		return {
 			restrict: 'A',
 			require: '^advancedSelect',
 			scope: true,
 			link: function(scope, element) {
+
+				/**
+				 * Scroll the list to make visible the option
+				 * @param position : 'middle' or 'none'
+				 */
 				scope.$parent.item.makeVisible = function(position) {
 					var position = angular.isDefined(position) ? position : 'none';
 					var top = 0;
@@ -696,6 +784,7 @@ angular.module('vd.directive.advanced_select', [])
 					}
 				};
 
+				// Make the option visible when highlighted
 				scope.$watch('item.highlighted', function(highlighted) {
 					if (highlighted) {
 						scope.item.makeVisible();
@@ -703,4 +792,23 @@ angular.module('vd.directive.advanced_select', [])
 				});
 			}
 		};
+	})
+	/**
+	 * Options filter. Remove a sub list of options from the main options list
+	 */
+	.filter('exclude', function() {
+		/**
+		 * @param options : the main list of options
+		 * @param excluded : the sub list of options to remove
+		 */
+		return function(options, excluded) {
+			return options.filter(function(element, index, array) {
+				for(var i=0, n=excluded.length; i < n; i++) {
+					if (element.value == excluded[i].value) {
+						return false;
+					}
+				}
+				return true;
+			});
+		}
 	});
