@@ -32,30 +32,15 @@ angular.module('vd.directive.advanced_select', [])
 		};
 	})
 	.filter('exclude', function() {
-		return function(list, excludes, valueFn) {
-			var valueFn = angular.isDefined(valueFn) ? valueFn : function(value) { return value; };
-			var excludeValues = [];
-			angular.forEach(excludes, function(exclude) {
-				excludeValues.push(valueFn(exclude.target));
-			})
-
-			var newList = [];
-			for( var i=0, n=list.length; i < n; i++) {
-			//angular.forEach(list, function(item) {
-				var item = list[i];
-				var isExcluded = false;
-				var value = valueFn(item.target);
-				angular.forEach(excludeValues, function(excludeValue) {
-					if (excludeValue == value) {
-						isExcluded = true;
+		return function(list, excludes) {
+			return list.filter(function(element, index, array) {
+				for(var i=0, n=excludes.length; i < n; i++) {
+					if (element.value == excludes[i].value) {
+						return false;
 					}
-				});
-
-				if (!isExcluded) {
-					newList.push(item);
 				}
-			}
-			return newList;
+				return true;
+			});
 		}
 	})
 	.directive('advancedSelectMultiple', function($parse, $filter, $timeout) {
@@ -106,10 +91,8 @@ angular.module('vd.directive.advanced_select', [])
 				}
 
 				scope.select = function(item, updateModel, focus) {
-					//scope.selected = angular.extend(scope.selected, [item]);
 					pushOnce(scope.selected, item);
-					//scope.highlight(item);
-
+					
 					// Set the focus
 					if (angular.isDefined(focus) && focus) {
 						element.find('.advanced-select-choices').focus();
@@ -118,7 +101,7 @@ angular.module('vd.directive.advanced_select', [])
 					// Update the model
 					if (angular.isUndefined(updateModel) || updateModel) {
 						var m = scope.getNgModel(scope);
-						pushOnce(m, scope.valueFn(item.target));
+						pushOnce(m, item.value);
 						scope.setNgModel(scope, m);
 					}
 
@@ -126,7 +109,6 @@ angular.module('vd.directive.advanced_select', [])
 						adjustSearchInputWidth();
 					});
 					
-
 					// Hide the drop down
 					scope.dropDownOpen = false;
 				};
@@ -135,13 +117,11 @@ angular.module('vd.directive.advanced_select', [])
 					var results = angular.isDefined(results) ? results : $filter('filter')(scope.options, scope.search);
 					for(var i=0, n = results.length; i < n; i++) {
 						var r = results[i];
-						var value = scope.valueFn(r.target);
 						for(var j=0, m=ngModel.length; j < m; j++) {
-							if (value == ngModel[j]) {
+							if (r.value == ngModel[j]) {
 								scope.select(r, false, false);
 							}
 						}
-						
 						if (r.children) {
 							scope.updateSelection(ngModel, r.children);
 						}
@@ -149,7 +129,6 @@ angular.module('vd.directive.advanced_select', [])
 				};
 
 				scope.DropDownOpened = function() {
-
 					element.find('input').focus();
 					if (element.offset().top + element.outerHeight() + element.find('.advanced-select-drop').outerHeight() 
 							<= $(window).scrollTop() + document.documentElement.clientHeight) {
@@ -209,7 +188,7 @@ angular.module('vd.directive.advanced_select', [])
 				'</ul>'+
 				'<div class="advanced-select-drop" ng-show="dropDownOpen">'+
 					'<ul class="results">'+
-						'<li advanced-select-option class="advanced-select-result advanced-select-result-selectable" ng-repeat="item in options | exclude:selected:valueFn | filter:search"  ng-class="{ \'with-children\': item.children.length > 0 }">'+
+						'<li advanced-select-option class="advanced-select-result advanced-select-result-selectable" ng-repeat="item in options | exclude:selected | filter:search"  ng-class="{ \'with-children\': item.children.length > 0 }">'+
 							'<div advanced-select-item '+
 							     'class="label" '+
 							     'ng-bind="item.label" ' + 
@@ -250,7 +229,7 @@ angular.module('vd.directive.advanced_select', [])
 					
 					// Update the model
 					if (angular.isUndefined(updateModel) || updateModel) {
-						scope.setNgModel(scope, scope.valueFn(item.target));
+						scope.setNgModel(scope, item.value);
 					}
 
 					// Hide the drop down
@@ -507,7 +486,6 @@ angular.module('vd.directive.advanced_select', [])
 					fillInResultsFromSelect();
 				}
 
-				scope.valueFn = valueFn;
 				scope.setNgModel = setNgModel;
 				scope.getNgModel = getNgModel;
 
@@ -515,7 +493,7 @@ angular.module('vd.directive.advanced_select', [])
 					var results = angular.isDefined(results) ? results : $filter('filter')(scope.options, scope.search);
 					for(var i=0, n = results.length; i < n; i++) {
 						var r = results[i];
-						if (valueFn(r.target) == ngModel) {
+						if (r.value == ngModel) {
 							scope.select(r, false, false);
 							return;
 						}
@@ -633,13 +611,18 @@ angular.module('vd.directive.advanced_select', [])
 								if (!angular.isDefined(groups[groupByName])) {
 									groups[groupByName] = [];
 								}
-								groups[groupByName].push({ target: item, label: labelFn(scope, item) });
+								groups[groupByName].push({ 
+									target: item, 
+									value: valueFn(item),
+									label: labelFn(scope, item) 
+								});
 							});
 
 							angular.forEach(groups, function(subitems, groupName) {
 								scope.options.push({
 									target: null,
 									label: groupName,
+									value: null,
 									children: subitems
 								});
 							});
@@ -649,6 +632,7 @@ angular.module('vd.directive.advanced_select', [])
 							angular.forEach(items, function(item) {
 								scope.options.push({
 									target: item,
+									value: valueFn(item),
 									label: labelFn(scope, item)
 								});
 							});
