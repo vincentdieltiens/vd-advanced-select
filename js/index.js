@@ -49,7 +49,7 @@ angular.module('app', ['directive.tabs', 'vd.directive.advanced_select'])
 		}
 	})
 	.controller('example7', function($scope) {
-		$scope.language = { id: null };
+		$scope.selected_languages = [];
 		$scope.languages = [
 			{ id: 0, name: 'English' }, 
 			{ id: 1, name: 'Français' }, 
