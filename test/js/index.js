@@ -55,6 +55,27 @@ angular.module('app', ['directive.tabs', 'vd.directive.advanced_select'])
 			{ id: 1, name: 'Français' }, 
 			{ id: 2, name: 'Italiano' }
 		];
+	})
+	.controller('example8', function($scope) {
+		$scope.person = {};
+
+		var Person = function(id, first_name, last_name) {
+			this.id = id;
+			this.first_name = first_name;
+			this.last_name = last_name;
+		}
+
+		Person.prototype = {
+			fullName: function() {
+				return this.first_name+' '+this.last_name;
+			}
+		}
+
+		$scope.persons = [
+			new Person(0, 'Michael', 'Jordan'),
+			new Person(1, 'Shaquille', 'O\'neal'),
+			new Person(2, 'Magic', 'Johnson')
+		];
 	});
 
 $(document).ready(function() {

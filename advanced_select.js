@@ -356,7 +356,6 @@ angular.module('vd.directive.advanced_select', [])
 				}, true);
 
 				scope.$watch('search.label', function() {
-					console.log('search label changed');
 					scope.setFilteredOptions();
 				});
 
@@ -426,7 +425,7 @@ angular.module('vd.directive.advanced_select', [])
 								groups[groupByName].push({ 
 									target: item, 
 									value: valueFn(item),
-									label: labelFn(scope, item) 
+									label: labelFn(item) 
 								});
 							});
 
@@ -444,13 +443,12 @@ angular.module('vd.directive.advanced_select', [])
 								scope.options.push({
 									target: item,
 									value: valueFn(item),
-									label: labelFn(scope, item)
+									label: labelFn(item)
 								});
 							});
 							
 						}
 
-						console.log('ok...');
 						scope.setFilteredOptions();
 						
 						if ((modelValue = getNgModel(scope)) != null) {
@@ -583,7 +581,6 @@ angular.module('vd.directive.advanced_select', [])
 				 */
 				$scope.setFilteredOptions = function() {
 					$scope.filteredOptions = $filter('filter')($filter('exclude')($scope.options, $scope.selected), $scope.search);
-					console.log('set filteded....', $scope.filteredOptions)
 				}
 
 				/**
