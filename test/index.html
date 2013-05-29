@@ -386,10 +386,10 @@ app.controller('example7', function($scope) {
 			</div>
 		</div>
 
-				<!--####### EXAMPLE 8 #######-->
+		<!--####### EXAMPLE 8 #######-->
 		<div class="example" ng-controller="example8">
 			<div class="result">
-				<h2>Multiple list</h2>
+				<h2>Simple list of object with a function as label</h2>
 				<select 
 			        ng-model="person" 
 			        ng-options="person.id as person.fullName() for person in persons"
@@ -405,13 +405,12 @@ app.controller('example7', function($scope) {
 				<tabs>
 					<tab name="Html">
 						<pre class="prettyprint linenums">
-&lt;div ng-controller="example7"&gt;
+&lt;div ng-controller="example8"&gt;
 	&lt;select 
-	    ng-model="selected_languages" 
-	    ng-options="language.id as language.name for language in languages"
-	    placeholder="Select one or more language"
-	    class="languages"
-	    multiple="true"
+	    ng-model="person" 
+	    ng-options="person.id as person.fullName() for person in persons"
+	    placeholder="Select one person"
+	    class="persons"
 	    advanced&gt;
 	&lt;/select&gt;
 &lt;/div&gt;
@@ -419,20 +418,105 @@ app.controller('example7', function($scope) {
 					</tab>
 					<tab name="AngularJS">
 						<pre class="prettyprint linenums">
-app.controller('example7', function($scope) {
-	$scope.selected_languages = [0, 2];
-	$scope.languages = [
-		{ id: 0, name: 'English' }, 
-		{ id: 1, name: 'Français' }, 
-		{ id: 2, name: 'Italiano' }
+app.controller('example8', function($scope) {
+	$scope.person = {};
+
+	var Person = function(id, first_name, last_name) {
+		this.id = id;
+		this.first_name = first_name;
+		this.last_name = last_name;
+	}
+
+	Person.prototype = {
+		fullName: function() {
+			return this.first_name+' '+this.last_name;
+		}
+	}
+
+	$scope.persons = [
+		new Person(0, 'Michael', 'Jordan'),
+		new Person(1, 'Shaquille', 'O\'neal'),
+		new Person(2, 'Magic', 'Johnson')
 	];
 });
 						</pre>
 					</tab>
 					<tab name="CSS">
 						<pre class="prettyprint linenums">
-.languages {
+						</pre>
+					</tab>
+				</tabs>
+			</div>
+		</div>
+
+				<!--####### EXAMPLE 9 #######-->
+		<div class="example" ng-controller="example8">
+			<div class="result">
+				<h2>Advanced Select in an overflow:hidden box</h2>
+
+				<div class="box">
+					<select 
+				        ng-model="person" 
+				        ng-options="person.id as person.fullName() for person in persons"
+				        placeholder="Select one person"
+				        class="persons"
+			            advanced>
+					</select>
+				</div>
+				<br /><br />
+				Selected person : {{ person }}
+			</div>
+			<div class="code">
+				<h2>Code</h2>
+				<tabs>
+					<tab name="Html">
+						<pre class="prettyprint linenums">
+&lt;div ng-controller="example8"&gt;
+	&lt;div class="box">
+		&lt;select 
+		    ng-model="person" 
+		    ng-options="person.id as person.fullName() for person in persons"
+		    placeholder="Select one person"
+		    class="persons"
+		    advanced>
+		&lt;/select&gt;
+	&lt;/div&gt;
+&lt;/div&gt;
+						</pre>
+					</tab>
+					<tab name="AngularJS">
+						<pre class="prettyprint linenums">
+app.controller('example8', function($scope) {
+	$scope.person = {};
+
+	var Person = function(id, first_name, last_name) {
+		this.id = id;
+		this.first_name = first_name;
+		this.last_name = last_name;
+	}
+
+	Person.prototype = {
+		fullName: function() {
+			return this.first_name+' '+this.last_name;
+		}
+	}
+
+	$scope.persons = [
+		new Person(0, 'Michael', 'Jordan'),
+		new Person(1, 'Shaquille', 'O\'neal'),
+		new Person(2, 'Magic', 'Johnson')
+	];
+});
+						</pre>
+					</tab>
+					<tab name="CSS">
+						<pre class="prettyprint linenums">
+.box {
+	border: 1px solid #ccc; 
+	background-color: #eee; 
 	width: 200px;
+	height: 50px;
+	overflow: hidden;
 }
 						</pre>
 					</tab>

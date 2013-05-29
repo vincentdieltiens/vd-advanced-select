@@ -269,6 +269,8 @@ angular.module('vd.directive.advanced_select', [])
 				    groupBy = null,
 				    value = [];
 
+				var dropDownElement = element.find('.advanced-select-drop');
+				
 				if (attrs.options) {
 					var match = attrs.options.match(NG_OPTIONS_REGEXP),
 					    item = match[4] || match[6],
@@ -324,7 +326,19 @@ angular.module('vd.directive.advanced_select', [])
 						$(document).bind('keydown.advanced_select', handleKeysWhenDropDownOpened)
 						           .bind('mousedown.advanced_select', handleMouseWhenDropDownOpened);
 						
+						dropDownElement.detach();
+						$('body').append(dropDownElement);
+
 						scope.DropDownOpened();
+
+						dropDownElement.css({
+							'position': 'absolute',
+							'width': element.outerWidth()
+						});
+						dropDownElement.offset({ 
+							left: element.offset().left,
+							top: element.offset().top + element.height()
+						}); 
 
 						if (!scope.hasHighlighted()) {
 							scope.highlightFirst();
@@ -338,6 +352,9 @@ angular.module('vd.directive.advanced_select', [])
 						$(document).unbind('mousedown.advanced_select')
 						           .unbind('keydown.advanced_select');
 						scope.search = '';
+
+						dropDownElement.detach();
+						element.append(dropDownElement);
 					}
 				});
 
@@ -360,8 +377,9 @@ angular.module('vd.directive.advanced_select', [])
 				});
 
 				function handleMouseWhenDropDownOpened(e) {
-					var container = angular.element(e.target).parents('.advanced-select-container');
-					if (container.length == 0 || container[0] != element.get(0)) {
+					var container = angular.element(e.target).parents('.advanced-select-drop');
+					console.log('=====>', container);
+					if (container.length == 0 || container[0] != dropDownElement.get(0)) {
 						scope.dropDownOpen = false;
 						scope.$apply();
 					}
@@ -425,7 +443,7 @@ angular.module('vd.directive.advanced_select', [])
 								groups[groupByName].push({ 
 									target: item, 
 									value: valueFn(item),
-									label: labelFn(item) 
+									label: labelFn(item) || labelFn(scope, item)
 								});
 							});
 
@@ -439,11 +457,12 @@ angular.module('vd.directive.advanced_select', [])
 							});
 						} else {
 							scope.options = [];
+
 							angular.forEach(items, function(item) {
 								scope.options.push({
 									target: item,
 									value: valueFn(item),
-									label: labelFn(item)
+									label: labelFn(item) || labelFn(scope, item)
 								});
 							});
 							
