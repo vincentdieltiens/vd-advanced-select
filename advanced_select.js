@@ -36,7 +36,7 @@ angular.module('vd.directive.advanced_select', [])
 	/**
 	 * Base directive for creating an advanced select
 	 */
-	.directive('advancedSelect', function($parse, $filter) {
+	.directive('advancedSelect', function($parse, $filter, $timeout) {
 		                       //0000111110000000000022220000000000000000000000333300000000000000444444444444444440000000005555555555555555500000006666666666666666600000000000000077770
 		var NG_OPTIONS_REGEXP = /^\s*(.*?)(?:\s+as\s+(.*?))?(?:\s+group\s+by\s+(.*))?\s+for\s+(?:([\$\w][\$\w\d]*)|(?:\(\s*([\$\w][\$\w\d]*)\s*,\s*([\$\w][\$\w\d]*)\s*\)))\s+in\s+(.*)$/;
 
@@ -68,6 +68,8 @@ angular.module('vd.directive.advanced_select', [])
 
 				// The model of the search box
 				$scope.search = '';
+
+				$scope.dropDownIsOnTop = false;
 
 				$scope.setFilteredOptions = function() {
 					$scope.filteredOptions = $filter('filter')($scope.options, $scope.search);
@@ -269,7 +271,7 @@ angular.module('vd.directive.advanced_select', [])
 				    groupBy = null,
 				    value = [];
 
-				var dropDownElement = element.find('.advanced-select-drop');
+				scope.dropDownElement = element.find('.advanced-select-drop');
 				
 				if (attrs.options) {
 					var match = attrs.options.match(NG_OPTIONS_REGEXP),
@@ -305,19 +307,16 @@ angular.module('vd.directive.advanced_select', [])
 						scope.highlight(scope.selected);
 					}
 
-					// Set the focus on the input
-					element.find('input').focus();
-
 					// Adjust the position of the dropdown according to the available space
-					// And move the search field according to the position
-					if (element.offset().top + element.outerHeight() + element.find('.advanced-select-drop').outerHeight() 
+					if (element.offset().top + element.outerHeight() + scope.dropDownElement.outerHeight() 
 							<= $(window).scrollTop() + document.documentElement.clientHeight) {
-						element.removeClass('top');
-						element.find('.results').before(element.find('.search').detach());
+						scope.dropDownElement.find('.results').before(scope.dropDownElement.find('.search').detach());
 					} else {
-						element.addClass('top');
-						element.find('.results').after(element.find('.search').detach());
+						scope.dropDownElement.find('.results').after(scope.dropDownElement.find('.search').detach());
 					}
+
+					// Set the focus on the input
+					scope.dropDownElement.find('input').focus();
 				}
 
 				/* Wachtes and observes */
@@ -326,19 +325,43 @@ angular.module('vd.directive.advanced_select', [])
 						$(document).bind('keydown.advanced_select', handleKeysWhenDropDownOpened)
 						           .bind('mousedown.advanced_select', handleMouseWhenDropDownOpened);
 						
-						dropDownElement.detach();
-						$('body').append(dropDownElement);
+						scope.dropDownElement.detach();
+						$('body').append(scope.dropDownElement);
+
+						// Adjust the position of the dropdown according to the available space
+						if (element.offset().top + element.outerHeight() + scope.dropDownElement.outerHeight() 
+							<= $(window).scrollTop() + document.documentElement.clientHeight) {
+							// bottom
+
+							scope.dropDownIsOnTop = false;
+
+							scope.dropDownElement.css({
+								'position': 'absolute',
+								'width': element.outerWidth()
+							});
+
+							scope.adjustDropDownPosition();
+							
+							element.removeClass('top');
+							scope.dropDownElement.removeClass('top');
+						} else {
+							// top
+
+							scope.dropDownIsOnTop = true;
+
+							scope.dropDownElement.css({
+								'position': 'absolute',
+								'width': element.outerWidth()
+							});
+
+							scope.adjustDropDownPosition();
+
+							element.addClass('top');
+							scope.dropDownElement.addClass('top');
+						}
 
 						scope.DropDownOpened();
 
-						dropDownElement.css({
-							'position': 'absolute',
-							'width': element.outerWidth()
-						});
-						dropDownElement.offset({ 
-							left: element.offset().left,
-							top: element.offset().top + element.height()
-						}); 
 
 						if (!scope.hasHighlighted()) {
 							scope.highlightFirst();
@@ -353,8 +376,8 @@ angular.module('vd.directive.advanced_select', [])
 						           .unbind('keydown.advanced_select');
 						scope.search = '';
 
-						dropDownElement.detach();
-						element.append(dropDownElement);
+						scope.dropDownElement.detach();
+						element.append(scope.dropDownElement);
 					}
 				});
 
@@ -374,12 +397,30 @@ angular.module('vd.directive.advanced_select', [])
 
 				scope.$watch('search.label', function() {
 					scope.setFilteredOptions();
+					$timeout(function() {
+						scope.adjustDropDownPosition();
+					});
+					
 				});
 
+				scope.adjustDropDownPosition = function() {
+					if (!scope.dropDownIsOnTop) {
+						scope.dropDownElement.offset({ 
+							left: element.offset().left,
+							top: element.offset().top + element.height()
+						}); 	
+					} else {
+						scope.dropDownElement.offset({ 
+							left: element.offset().left,
+							top: element.offset().top - scope.dropDownElement.outerHeight()
+						}); 
+					}
+				}
+
 				function handleMouseWhenDropDownOpened(e) {
-					var container = angular.element(e.target).parents('.advanced-select-drop');
-					console.log('=====>', container);
-					if (container.length == 0 || container[0] != dropDownElement.get(0)) {
+					var container = angular.element(e.target).parents('.advanced-select-container');
+					var drop = angular.element(e.target).parents('.advanced-select-drop');
+					if (container.length == 0 && drop.length == 0) {
 						scope.dropDownOpen = false;
 						scope.$apply();
 					}
@@ -677,7 +718,7 @@ angular.module('vd.directive.advanced_select', [])
 					
 					// Set the focus
 					if (angular.isDefined(focus) && focus) {
-						element.find('.advanced-select-choices').focus();
+						element.find('.advanced-select-choices input').focus();
 					}
 					
 					// Update the model
@@ -703,7 +744,7 @@ angular.module('vd.directive.advanced_select', [])
 					element.find('input').focus();
 
 					// Adjust the position of the dropdown according to the available space
-					if (element.offset().top + element.outerHeight() + element.find('.advanced-select-drop').outerHeight() 
+					if (element.offset().top + element.outerHeight() + scope.dropDownElement.outerHeight() 
 							<= $(window).scrollTop() + document.documentElement.clientHeight) {
 						element.removeClass('top');
 					} else {
@@ -726,7 +767,6 @@ angular.module('vd.directive.advanced_select', [])
 				 */
 				scope.unselect = function(index, e) {
 					if (e) {
-						console.log('===>', e)
 						e.preventDefault();
 						e.stopPropagation();
 					}
@@ -805,7 +845,6 @@ angular.module('vd.directive.advanced_select', [])
 	.directive('advancedSelectOption', function() {
 		return {
 			restrict: 'A',
-			require: '^advancedSelect',
 			scope: true,
 			link: function(scope, element) {
 
