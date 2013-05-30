@@ -67,7 +67,7 @@ angular.module('vd.directive.advanced_select', [])
 				$scope.placeholder = $attrs.placeholder;
 
 				// The model of the search box
-				$scope.search = '';
+				$scope.search = { label: '' };
 
 				$scope.dropDownIsOnTop = false;
 
@@ -376,7 +376,7 @@ angular.module('vd.directive.advanced_select', [])
 					} else {
 						$(document).unbind('mousedown.advanced_select')
 						           .unbind('keydown.advanced_select');
-						scope.search = '';
+						scope.search.label = '';
 
 						scope.dropDownElement.detach();
 						element.append(scope.dropDownElement);
@@ -683,7 +683,7 @@ angular.module('vd.directive.advanced_select', [])
 				function handleKeys(e) {
 					switch(e.keyCode) {
 						case 8: // Backspace
-							if (scope.search == '') {
+							if (scope.search.label == '') {
 								scope.unselectLast(e);
 								scope.$apply();
 							}
