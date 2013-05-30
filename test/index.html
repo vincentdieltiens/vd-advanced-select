@@ -449,7 +449,7 @@ app.controller('example8', function($scope) {
 			</div>
 		</div>
 
-				<!--####### EXAMPLE 9 #######-->
+		<!--####### EXAMPLE 9 #######-->
 		<div class="example" ng-controller="example8">
 			<div class="result">
 				<h2>Advanced Select in an overflow:hidden box</h2>
@@ -524,7 +524,62 @@ app.controller('example8', function($scope) {
 			</div>
 		</div>
 
-
+		<!--####### EXAMPLE 10 #######-->
+		<div class="example" ng-controller="example10">
+			<div class="result">
+				<h2>Simple List of objects with label using filter</h2>
+				<select id="languages1" ng-model="language.id" 
+				    ng-options="language.id as language | namelowercase for language in languages"
+				    class="languages"
+				    placeholder="select a language"
+				    advanced>
+				</select>
+				<br /><br />
+				Selected Language Id : {{ language.id }}
+			</div>
+			<div class="code">
+				<h2>Code</h2>
+				<tabs>
+					<tab name="Html">
+						<pre class="prettyprint linenums">
+&lt;div ng-controller="example10"&gt;
+	&lt;select 
+	    ng-model="language.id" 
+	    ng-options="language.id as language | namelowercase for language in languages"
+	    class="languages"
+	    placeholder="select a language"
+	    advanced&gt;
+	&lt;/select&gt;
+&lt;/div&gt;
+						</pre>
+					</tab>
+					<tab name="AngularJS">
+						<pre class="prettyprint linenums">
+app.controller('example10', function($scope) {
+	$scope.language = { id: null };
+	$scope.languages = [
+		{ id: 0, name: 'English' }, 
+		{ id: 1, name: 'Français' }, 
+		{ id: 2, name: 'Italiano' }
+	];
+})
+.filter('namelowercase', function() {
+	return function(object) {
+		return object.name.toLowerCase();
+	}
+});
+						</pre>
+					</tab>
+					<tab name="CSS">
+						<pre class="prettyprint linenums">
+.languages {
+	width: 200px;
+}
+						</pre>
+					</tab>
+				</tabs>
+			</div>
+		</div>
 
 	</body>
 </html>

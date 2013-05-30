@@ -76,6 +76,19 @@ angular.module('app', ['directive.tabs', 'vd.directive.advanced_select'])
 			new Person(1, 'Shaquille', 'O\'neal'),
 			new Person(2, 'Magic', 'Johnson')
 		];
+	})
+	.controller('example10', function($scope) {
+		$scope.language = { id: null };
+		$scope.languages = [
+			{ id: 0, name: 'English' }, 
+			{ id: 1, name: 'Français' }, 
+			{ id: 2, name: 'Italiano' }
+		];
+	})
+	.filter('namelowercase', function() {
+		return function(object) {
+			return object.name.toLowerCase();
+		}
 	});
 
 $(document).ready(function() {

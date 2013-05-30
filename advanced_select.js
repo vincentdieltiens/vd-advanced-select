@@ -269,7 +269,9 @@ angular.module('vd.directive.advanced_select', [])
 				    item = "item",
 				    optionsModel = null,
 				    groupBy = null,
-				    value = [];
+				    groupByFn = null,
+				    value=null,
+				    valueFn=null;
 
 				scope.dropDownElement = element.find('.advanced-select-drop');
 				
@@ -277,16 +279,16 @@ angular.module('vd.directive.advanced_select', [])
 					var match = attrs.options.match(NG_OPTIONS_REGEXP),
 					    item = match[4] || match[6],
 					    //
-					    label = (match[2] || match[1]).replace(new RegExp(item), ''),
-					    labelExp = label.replace(new RegExp('^\.'), ''),
-					    labelFn = labelExp ? $parse(labelExp) : function(s, value) { return value },
+					    label = (match[2] || match[1]).replace(new RegExp('^'+item), 'item'),
+					    labelFn = $parse(label);
 					    //
-					    value = match[2] ? match[1].replace(new RegExp(item + '\.?'), '') : null,
-					    valueFn = value ? $parse(value) : function(value) { return value },
+					    value = match[1].replace(new RegExp('^'+item), 'item'),
+					    valueFn = $parse(value),
 					    //
-					    groupBy = match[3] ? match[3].replace(new RegExp(item + '\.?'), '') : null,
-					    groupByFn = $parse((match[3] || '').replace(new RegExp(item + '\.?'), '')),
+					    groupBy = match[3] ? match[3].replace(new RegExp('^'+item), 'item') : null,
+					    groupByFn = $parse(groupBy),
 					    optionsModel = match[7];
+					
 					fillInResultsFromNgOptions();
 				} else {
 					fillInResultsFromSelect();
@@ -420,6 +422,8 @@ angular.module('vd.directive.advanced_select', [])
 				function handleMouseWhenDropDownOpened(e) {
 					var container = angular.element(e.target).parents('.advanced-select-container');
 					var drop = angular.element(e.target).parents('.advanced-select-drop');
+					e.stopPropagation();
+					e.preventDefault();
 					if (container.length == 0 && drop.length == 0) {
 						scope.dropDownOpen = false;
 						scope.$apply();
@@ -477,14 +481,17 @@ angular.module('vd.directive.advanced_select', [])
 							var groups = {};
 
 							angular.forEach(items, function(item) {
-								var groupByName = groupByFn(scope, item) || '';
+								var item = { 'item': item };
+
+								var groupByName = groupByFn(item);
 								if (!angular.isDefined(groups[groupByName])) {
 									groups[groupByName] = [];
 								}
+								
 								groups[groupByName].push({ 
-									target: item, 
+									target: item.item, 
 									value: valueFn(item),
-									label: labelFn(item) || labelFn(scope, item)
+									label: labelFn(item)
 								});
 							});
 
@@ -500,10 +507,11 @@ angular.module('vd.directive.advanced_select', [])
 							scope.options = [];
 
 							angular.forEach(items, function(item) {
+								var item = { 'item': item };
 								scope.options.push({
-									target: item,
+									target: item.item,
 									value: valueFn(item),
-									label: labelFn(item) || labelFn(scope, item)
+									label: labelFn(item )
 								});
 							});
 							
