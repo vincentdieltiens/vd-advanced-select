@@ -1,3 +1,18 @@
+@-webkit-keyframes loadingSprite {
+    from { background-position: 0px; }
+    to { background-position: -630px; }
+}
+
+@-moz-keyframes loadingSprite {
+    from { background-position: 0px; }
+    to { background-position: -630px; }
+}
+
+@keyframes loadingSprite {
+    from { background-position: 0px; }
+    to { background-position: -630px; }
+}
+
 .advanced-select-container {
 	position: relative;
 	display: inline-block;
@@ -72,6 +87,19 @@
 			/*border: 1px solid #b4d6ff;*/
 			background-color: #e9f3ff;
 			outline: none;
+		}
+
+		div.loading {
+			position: absolute;
+			right: 25px;
+			top: 2px;
+			width: 18px;
+			height: 18px;
+			opacity: 0.7;
+			background: url('../images/advanced-select-loading-18x18.png');
+			-webkit-animation: loadingSprite 1.5s steps(35, end) infinite;
+			-moz-animation: loadingSprite 1.5s steps(35, end) infinite;
+			animation: loadingSprite 1.5s steps(35, end) infinite;
 		}
 
 		div.arrow {

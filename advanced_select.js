@@ -582,8 +582,9 @@ angular.module('vd.directive.advanced_select', [])
 			'<div class="advanced-select-container" ng-class="{ \'advanced-select-dropdown-open\': dropDownOpen, \'disabled\': disabled }">'+
 				'<a href="javascript:void(0)" ng-click="dropDownOpen=(!disabled && !dropDownOpen)" class="advanced-select-choice" tabindex="tabIndex">'+
 					'<span ng-bind="selected.label || placeholder" ng-class="{ \'placeholder\': selected == null }"></span>'+
-						'<abbr class="advanced-select-search-choice-close" style="display: none;"></abbr>'+
-						'<div class="arrow"><b></b></div>'+
+					'<abbr class="advanced-select-search-choice-close" style="display: none;"></abbr>'+
+					'<div class="arrow"><b></b></div>'+
+					'<div class="loading" ng-show="filteredOptions.length == 0"></div>' +
 				'</a>'+
 				'<div class="advanced-select-drop" ng-show="dropDownOpen">'+
 					'<div class="search">'+
