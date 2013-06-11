@@ -595,16 +595,14 @@ angular.module('vd.directive.advanced_select', [])
 							'<div advanced-select-item '+
 							     'class="label" '+
 							     'ng-bind="item.label" ' + 
-							     'ng-class="{ \'advanced-select-highlighted\': item.highlighted == true }" '+ 
 							     'ng-click="select(item, true, true)" '+
 							     'ng-mouseover="highlight(item, this)">'+
 							'</div>'+
 							'<ul>'+
-								'<li advanced-select-option class="advanced-select-result" ng-repeat="item in item.children"  ng-class="{ \'advanced-select-highlighted\': item.highlighted == true }">'+
+								'<li advanced-select-option class="advanced-select-result" ng-repeat="item in item.children">'+
 									'<div class="label" '+
 									     'ng-bind="item.label" '+
 									     'ng-click="select(item, true, true)" '+
-									     'ng-class="{ \'advanced-select-highlighted\': item.highlighted == true }" '+
 									     'ng-mouseover="highlight(item)">'+
 									'</div>'+
 								'</li>'+
@@ -830,17 +828,15 @@ angular.module('vd.directive.advanced_select', [])
 						'<li advanced-select-option class="advanced-select-result advanced-select-result-selectable" ng-repeat="item in filteredOptions"  ng-class="{ \'with-children\': item.children.length > 0 }">'+
 							'<div advanced-select-item '+
 							     'class="label" '+
-							     'ng-bind="item.label" ' + 
-							     'ng-class="{ \'advanced-select-highlighted\': item.highlighted == true }" '+ 
+							     'ng-bind="item.label" '+ 
 							     'ng-click="select(item, true, true)" '+
 							     'ng-mouseover="highlight(item, this)">'+
 							'</div>'+
 							'<ul>'+
-								'<li advanced-select-option class="advanced-select-result" ng-repeat="item in item.children"  ng-class="{ \'advanced-select-highlighted\': item.highlighted == true }">'+
+								'<li advanced-select-option class="advanced-select-result" ng-repeat="item in item.children">'+
 									'<div class="label" '+
 									     'ng-bind="item.label" '+
 									     'ng-click="select(item, true, true)" '+
-									     'ng-class="{ \'advanced-select-highlighted\': item.itemhighlighted == true }" '+
 									     'ng-mouseover="highlight(item)">'+
 									'</div>'+
 								'</li>'+
@@ -856,6 +852,7 @@ angular.module('vd.directive.advanced_select', [])
 			restrict: 'A',
 			scope: true,
 			link: function(scope, element) {
+				var label = element.find('.label');
 
 				/**
 				 * Scroll the list to make visible the option
@@ -882,8 +879,14 @@ angular.module('vd.directive.advanced_select', [])
 
 				// Make the option visible when highlighted
 				scope.$watch('item.highlighted', function(highlighted) {
+					console.log('highlighted')
 					if (highlighted) {
 						scope.item.makeVisible();
+						element.addClass('advanced-select-highlighted');
+						label.addClass('advanced-select-highlighted');
+					} else {
+						element.removeClass('advanced-select-highlighted');
+						label.removeClass('advanced-select-highlighted');
 					}
 				});
 			}
