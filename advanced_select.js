@@ -312,6 +312,13 @@ angular.module('vd.directive.advanced_select', [])
 					scope.tabIndex = attrs.tabindex;
 				}
 
+				scope.$on('$destroy', function() {
+					element.remove();
+					if (scope.dropDownOpen) {
+						scope.dropDownElement.remove();
+					}
+				});
+
 				/**
 				 * Method called when the dropdown is just opened
 				 */
