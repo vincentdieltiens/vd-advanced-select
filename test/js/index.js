@@ -1,4 +1,4 @@
-angular.module('app', ['directive.tabs', 'vd.directive.advanced_select'])
+angular.module('app', ['directive.tabs', 'vd.directive.advanced_select', 'ngResource'])
 	.controller('example1', function($scope) {
 		$scope.language = { id: null };
 		$scope.languages = [
@@ -85,10 +85,17 @@ angular.module('app', ['directive.tabs', 'vd.directive.advanced_select'])
 			{ id: 2, name: 'Italiano' }
 		];
 	})
+	.controller('example11', function($scope, Language) {
+		$scope.language = { id: null };
+		$scope.languages = Language.query();
+	})
 	.filter('namelowercase', function() {
 		return function(object) {
 			return object.name.toLowerCase();
 		}
+	})
+	.factory('Language', function($resource) {
+		return $resource('languages.js/:languageId', {});
 	});
 
 $(document).ready(function() {

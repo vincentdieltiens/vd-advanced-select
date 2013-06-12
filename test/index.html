@@ -1,7 +1,7 @@
 <!doctype html>
 <html ng-app="app">
 	<head>
-		<title>AngularJS Advanced Select</title>
+		<title>AngularJS advanced="{ searchMinChars: 2, searchMinMessage: 'Enter at least two chars' }" Select</title>
 		<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
 		<link rel="stylesheet" type="text/css" href="../css/advanced_select.css" />
 		<link rel="stylesheet" type="text/css" href="css/tabs.css" />
@@ -10,6 +10,8 @@
 		<script type="text/javascript" src="http://ivaynberg.github.io/select2/prettify/prettify.min.js"></script>
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.6/angular.min.js"></script>
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.6/angular-resource.min.js"></script>
+
 		<script type="text/javascript" src="js/tabs.js"></script>
 		<script type="text/javascript" src="../advanced_select.js"></script>
 		<script type="text/javascript" src="js/index.js"></script>
@@ -580,6 +582,56 @@ app.controller('example10', function($scope) {
 				</tabs>
 			</div>
 		</div>
+
+
+		<!--####### EXAMPLE 11 #######-->
+		<div class="example" ng-controller="example11">
+			<div class="result">
+				<h2>Simple List Resource</h2>
+				<select id="languages11" ng-model="language.id" 
+				    ng-options="language.id as language.translations['fr-BE'].name for language in languages"
+				    class="languages"
+				    placeholder="select a language"
+				    advanced="{ searchMinChars: 2, searchMinMessage: 'Enter at least two chars' }">
+				</select>
+				<br /><br />
+				Selected Language Id : {{ language.id }}
+			</div>
+			<div class="code">
+				<h2>Code</h2>
+				<tabs>
+					<tab name="Html">
+						<pre class="prettyprint linenums">
+&lt;div ng-controller="example11"&gt;
+	&lt;select 
+	    ng-model="language.id" 
+	    ng-options="language.id as language.translations['fr-BE'].name for language in languages"
+	    class="languages"
+	    placeholder="select a language"
+	    advanced="{ searchMinChars: 2, searchMinMessage: 'Enter at least two chars' }"&gt;
+	&lt;/select&gt;
+&lt;/div&gt;
+						</pre>
+					</tab>
+					<tab name="AngularJS">
+						<pre class="prettyprint linenums">
+.controller('example11', function($scope, Language) {
+		$scope.language = { id: null };
+		$scope.languages = Language.query();
+	})
+						</pre>
+					</tab>
+					<tab name="CSS">
+						<pre class="prettyprint linenums">
+.languages {
+	width: 200px;
+}
+						</pre>
+					</tab>
+				</tabs>
+			</div>
+		</div>
+
 
 	</body>
 </html>

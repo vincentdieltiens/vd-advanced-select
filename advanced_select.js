@@ -10,9 +10,9 @@ angular.module('vd.directive.advanced_select', [])
 				// Creates the Advanced Select using the second directive
 				var el;
 				if (attrs.multiple) {
-					el = angular.element('<advanced-select advanced-select-multiple class="'+attrs.class+'" ng-model="'+attrs.ngModel+'" options="'+attrs.ngOptions+'"></advanced-select>');
+					el = angular.element('<advanced-select advanced-select-multiple config="'+attrs.advanced+'" class="'+attrs.class+'" ng-model="'+attrs.ngModel+'" options="'+attrs.ngOptions+'"></advanced-select>');
 				} else {
-					el = angular.element('<advanced-select advanced-select-simple class="'+attrs.class+'" ng-model="'+attrs.ngModel+'" options="'+attrs.ngOptions+'"></advanced-select>');
+					el = angular.element('<advanced-select advanced-select-simple config="'+attrs.advanced+'" class="'+attrs.class+'" ng-model="'+attrs.ngModel+'" options="'+attrs.ngOptions+'"></advanced-select>');
 				}
 				
 				if (angular.isDefined(attrs.disabled)) {
@@ -69,10 +69,16 @@ angular.module('vd.directive.advanced_select', [])
 				// The model of the search box
 				$scope.search = { label: '' };
 
+				$scope.config = null;
+
 				$scope.dropDownIsOnTop = false;
 
 				$scope.setFilteredOptions = function() {
-					$scope.filteredOptions = $filter('filter')($scope.options, $scope.search);
+					if ($scope.config == null || $scope.search.label.length >= $scope.config.searchMinChars) {
+						$scope.filteredOptions = $filter('filter')($scope.options, $scope.search);
+					} else {
+						$scope.filteredOptions = [];
+					}
 				}
 
 				/**
@@ -272,9 +278,16 @@ angular.module('vd.directive.advanced_select', [])
 				    groupByFn = null,
 				    value=null,
 				    valueFn=null;
+				
 
 				scope.dropDownElement = element.find('.advanced-select-drop');
-				
+				if (attrs.config) {
+					scope.config = scope.$eval(attrs.config);
+					if (typeof(scope.config) == 'string') {
+						scope.config = $parse('$parent.'+config)();
+					}
+				}
+
 				if (attrs.options) {
 					var match = attrs.options.match(NG_OPTIONS_REGEXP),
 					    item = match[4] || match[6],
@@ -324,6 +337,8 @@ angular.module('vd.directive.advanced_select', [])
 				/* Wachtes and observes */
 				scope.$watch('dropDownOpen', function() {
 					if (scope.dropDownOpen) {
+						scope.setFilteredOptions();
+						
 						$(document).bind('keydown.advanced_select', handleKeysWhenDropDownOpened)
 						           .bind('mousedown.advanced_select', handleMouseWhenDropDownOpened);
 						
@@ -398,7 +413,17 @@ angular.module('vd.directive.advanced_select', [])
 				}, true);
 
 				scope.$watch('search.label', function() {
-					scope.setFilteredOptions();
+					
+					if (scope.timeout) {
+						clearTimeout(scope.timeout);
+					}
+
+					scope.timeout = setTimeout(function() {
+						scope.setFilteredOptions();
+						scope.$apply();
+						scope.timeout = null;
+					}, 10);
+					
 					$timeout(function() {
 						scope.adjustDropDownPosition();
 					});
@@ -517,7 +542,7 @@ angular.module('vd.directive.advanced_select', [])
 							
 						}
 
-						scope.setFilteredOptions();
+						//scope.setFilteredOptions();
 						
 						if ((modelValue = getNgModel(scope)) != null) {
 							scope.updateSelection(modelValue);
@@ -538,7 +563,7 @@ angular.module('vd.directive.advanced_select', [])
 							label: option.html()
 						});
 					});
-					scope.setFilteredOptions();
+					//scope.setFilteredOptions();
 				}
 			}
 		};
@@ -584,7 +609,7 @@ angular.module('vd.directive.advanced_select', [])
 					'<span ng-bind="selected.label || placeholder" ng-class="{ \'placeholder\': selected == null }"></span>'+
 					'<abbr class="advanced-select-search-choice-close" style="display: none;"></abbr>'+
 					'<div class="arrow"><b></b></div>'+
-					'<div class="loading" ng-show="filteredOptions.length == 0"></div>' +
+					'<div class="loading" ng-show="options.length == 0"></div>' +
 				'</a>'+
 				'<div class="advanced-select-drop" ng-show="dropDownOpen">'+
 					'<div class="search">'+
@@ -609,6 +634,7 @@ angular.module('vd.directive.advanced_select', [])
 							'</ul>'+
 						'</li>'+
 					'</ul>'+
+					'<div class="search-min-message" ng-show="config && config.searchMinChars && search.label.length < config.searchMinChars" ng-bind="config.searchMinMessage"></div>'+
 				'</div>'+
 			'</div>'
 		};
@@ -879,7 +905,6 @@ angular.module('vd.directive.advanced_select', [])
 
 				// Make the option visible when highlighted
 				scope.$watch('item.highlighted', function(highlighted) {
-					console.log('highlighted')
 					if (highlighted) {
 						scope.item.makeVisible();
 						element.addClass('advanced-select-highlighted');
