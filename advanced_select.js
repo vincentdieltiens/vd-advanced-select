@@ -338,7 +338,7 @@ angular.module('vd.directive.advanced_select', [])
 				scope.$watch('dropDownOpen', function() {
 					if (scope.dropDownOpen) {
 						scope.setFilteredOptions();
-						
+
 						$(document).bind('keydown.advanced_select', handleKeysWhenDropDownOpened)
 						           .bind('mousedown.advanced_select', handleMouseWhenDropDownOpened);
 						
@@ -408,16 +408,14 @@ angular.module('vd.directive.advanced_select', [])
 
 				scope.$watch(attrs.ngModel, function(ngModel) {
 					if (ngModel != null) {
-						scope.updateSelection(ngModel);
+						scope.updateSelection(ngModel, scope.options);
 					}
 				}, true);
 
 				scope.$watch('search.label', function() {
-					
 					if (scope.timeout) {
 						clearTimeout(scope.timeout);
 					}
-
 					scope.timeout = setTimeout(function() {
 						scope.setFilteredOptions();
 						scope.$apply();
