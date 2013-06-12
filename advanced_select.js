@@ -313,7 +313,6 @@ angular.module('vd.directive.advanced_select', [])
 				}
 
 				scope.$on('$destroy', function() {
-					element.remove();
 					if (scope.dropDownOpen) {
 						scope.dropDownElement.remove();
 					}
@@ -391,7 +390,7 @@ angular.module('vd.directive.advanced_select', [])
 							scope.highlightFirst();
 						}
 
-						if (scope.highlighted) {
+						if (scope.highlighted && scope.highlighted.makeVisible) {
 							scope.highlighted.makeVisible('middle');
 						}
 						
