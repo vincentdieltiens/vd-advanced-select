@@ -549,7 +549,7 @@ angular.module('vd.directive.advanced_select', [])
 						//scope.setFilteredOptions();
 						
 						if ((modelValue = getNgModel(scope)) != null) {
-							scope.updateSelection(modelValue);
+							scope.updateSelection(modelValue, scope.options);
 						}
 						
 					}, true);
