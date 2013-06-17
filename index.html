@@ -25,7 +25,7 @@
 				    ng-options="language.id as language.name for language in languages"
 				    class="languages"
 				    placeholder="select a language"
-				    advanced>
+				    vd-advanced>
 				</select>
 				<br /><br />
 				Selected Language Id : {{ language.id != null || 'none' }}
@@ -41,7 +41,7 @@
 	    ng-options="language.id as language.name for language in languages"
 	    class="languages"
 	    placeholder="select a language"
-	    advanced&gt;
+	    vd-advanced&gt;
 	&lt;/select&gt;
 &lt;/div&gt;
 						</pre>
@@ -77,7 +77,7 @@ app.controller('example1', function($scope) {
 			        ng-model="number" 
 			        ng-options="number for number in numbers"
 			        class="numbers"
-		        advanced>
+		        vd-advanced>
 			</select>
 				<br /><br />
 				Selected numer : {{ number || 'none' }}
@@ -92,7 +92,7 @@ app.controller('example1', function($scope) {
 	    ng-model="number" 
 	    ng-options="number for number in numbers"
 	    class="numbers"
-	    advanced&gt;
+	    vd-advanced&gt;
 	&lt;/select&gt;
 &lt;/div&gt;
 						</pre>
@@ -124,7 +124,7 @@ app.controller('example2', function($scope) {
 			        ng-model="country.id" 
 			        ng-options="country.id as country.name for country in countries"
 			        class="countries"
-		        	advanced>
+		        	vd-advanced>
 				</select>
 				<br /><br />
 				Selected country id : {{ country.id != null || 'none' }}
@@ -139,7 +139,7 @@ app.controller('example2', function($scope) {
 	    ng-model="country.id" 
 	    ng-options="country.id as country.name for country in countries"
 	    class="countries"
-	    advanced&gt;
+	    vd-advanced&gt;
 	&lt;/select&gt;
 &lt;/div&gt;
 						</pre>
@@ -179,7 +179,7 @@ app.controller('example3', function($scope, $timeout) {
 			        ng-model="language.id" 
 			        ng-options="language.id as language.name group by language.group for language in languages"
 			        class="languages"
-		        advanced>
+		        vd-advanced>
 				</select>
 				<br /><br />
 				Selected language id : {{ language.id != null || 'none' }}
@@ -194,7 +194,7 @@ app.controller('example3', function($scope, $timeout) {
 	    ng-model="language.id" 
 	    ng-options="language.id as language.name group by language.group for language in languages"
 	    class="languages"
-	    advanced&gt;
+	    vd-advanced&gt;
 	&lt;/select&gt;
 &lt;/div&gt;
 						</pre>
@@ -233,7 +233,7 @@ app.controller('example4', function($scope) {
 				    class="languages"
 				    placeholder="select a language"
 				    disabled="disabled"
-				    advanced>
+				    vd-advanced>
 				</select>
 				<br /><br />
 				Selected Language Id : {{ language.id != null || 'none' }}
@@ -250,7 +250,7 @@ app.controller('example4', function($scope) {
 	    class="languages"
 	    placeholder="select a language"
 	    disabled="disabled"
-	    advanced&gt;
+	    vd-advanced&gt;
 	&lt;/select&gt;
 &lt;/div&gt;
 						</pre>
@@ -287,7 +287,7 @@ app.controller('example5', function($scope) {
 			        ng-options="year for year in years"
 			        placeholder="Select a year"
 			        class="years"
-		            advanced>
+		            vd-advanced>
 				</select>
 				<br /><br />
 				Selected Year : {{ year || 'none' }}
@@ -303,7 +303,7 @@ app.controller('example5', function($scope) {
 	    ng-options="year for year in years"
 	    placeholder="Select a year"
 	    class="years"
-	    advanced&gt;
+	    vd-advanced&gt;
 	&lt;/select&gt;
 &lt;/div&gt;
 						</pre>
@@ -340,7 +340,7 @@ app.controller('example6', function($scope, $timeout) {
 			        placeholder="Select one or more language"
 			        class="languages"
 			        multiple="true"
-		            advanced>
+		            vd-advanced>
 				</select>
 				<br /><br />
 				Selected languages : {{ selected_languages }}
@@ -357,7 +357,7 @@ app.controller('example6', function($scope, $timeout) {
 	    placeholder="Select one or more language"
 	    class="languages"
 	    multiple="true"
-	    advanced&gt;
+	    vd-advanced&gt;
 	&lt;/select&gt;
 &lt;/div&gt;
 						</pre>
