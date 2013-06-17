@@ -32,7 +32,7 @@ Note : As Advanced select is a `<a>` (or `input`), you have to activate the keyb
 Found a bug ?
 -------------
 
-Open an issue : https://github.com/vincentdieltiens/advanced-select/issues
+Open an issue : https://github.com/vincentdieltiens/vd-advanced-select/issues
 
 Copyright and License
 ---------------------
