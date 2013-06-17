@@ -2,7 +2,7 @@ angular.module('vd.directive.advanced_select', [])
 	/**
 	 * Directive that transform a regular <select> element into an advanced select
 	 */
-	.directive('advanced', function($compile) {
+	.directive('vdAdvanced', function($compile) {
 		return {
 			restrict: 'A',
 			require: ['select', 'ngModel'],
@@ -10,9 +10,9 @@ angular.module('vd.directive.advanced_select', [])
 				// Creates the Advanced Select using the second directive
 				var el;
 				if (attrs.multiple) {
-					el = angular.element('<advanced-select advanced-select-multiple config="'+attrs.advanced+'" class="'+attrs.class+'" ng-model="'+attrs.ngModel+'" options="'+attrs.ngOptions+'"></advanced-select>');
+					el = angular.element('<vd-advanced-select vd-advanced-select-multiple config="'+attrs.advanced+'" class="'+attrs.class+'" ng-model="'+attrs.ngModel+'" options="'+attrs.ngOptions+'"></advanced-select>');
 				} else {
-					el = angular.element('<advanced-select advanced-select-simple config="'+attrs.advanced+'" class="'+attrs.class+'" ng-model="'+attrs.ngModel+'" options="'+attrs.ngOptions+'"></advanced-select>');
+					el = angular.element('<vd-advanced-select vd-advanced-select-simple config="'+attrs.advanced+'" class="'+attrs.class+'" ng-model="'+attrs.ngModel+'" options="'+attrs.ngOptions+'"></advanced-select>');
 				}
 				
 				if (angular.isDefined(attrs.disabled)) {
@@ -36,7 +36,7 @@ angular.module('vd.directive.advanced_select', [])
 	/**
 	 * Base directive for creating an advanced select
 	 */
-	.directive('advancedSelect', function($parse, $filter, $timeout) {
+	.directive('vdAdvancedSelect', function($parse, $filter, $timeout) {
 		                       //0000111110000000000022220000000000000000000000333300000000000000444444444444444440000000005555555555555555500000006666666666666666600000000000000077770
 		var NG_OPTIONS_REGEXP = /^\s*(.*?)(?:\s+as\s+(.*?))?(?:\s+group\s+by\s+(.*))?\s+for\s+(?:([\$\w][\$\w\d]*)|(?:\(\s*([\$\w][\$\w\d]*)\s*,\s*([\$\w][\$\w\d]*)\s*\)))\s+in\s+(.*)$/;
 
@@ -575,10 +575,10 @@ angular.module('vd.directive.advanced_select', [])
 	/**
 	 * Directive to make an advanced select with single selection
 	 */ 
-	.directive('advancedSelectSimple', function($parse) {
+	.directive('vdAdvancedSelectSimple', function($parse) {
 		return {
 			restrict: 'A',
-			require: 'advancedSelect',
+			require: 'vdAdvancedSelect',
 			scope: true,
 			link: function(scope, element, attrs) {
 				/**
@@ -620,7 +620,7 @@ angular.module('vd.directive.advanced_select', [])
 						'<input type="text" ng-model="search.label" autocomplete="off" class="advanced-select-input" tabindex="-1" />'+
 					'</div>'+
 					'<ul class="results">'+
-						'<li advanced-select-option class="advanced-select-result advanced-select-result-selectable" ng-repeat="item in filteredOptions"  ng-class="{ \'with-children\': item.children.length > 0 }">'+
+						'<li vd-advanced-select-option class="advanced-select-result advanced-select-result-selectable" ng-repeat="item in filteredOptions"  ng-class="{ \'with-children\': item.children.length > 0 }">'+
 							'<div advanced-select-item '+
 							     'class="label" '+
 							     'ng-bind="item.label" ' + 
@@ -628,7 +628,7 @@ angular.module('vd.directive.advanced_select', [])
 							     'ng-mouseover="highlight(item, this)">'+
 							'</div>'+
 							'<ul>'+
-								'<li advanced-select-option class="advanced-select-result" ng-repeat="item in item.children">'+
+								'<li vd-advanced-select-option class="advanced-select-result" ng-repeat="item in item.children">'+
 									'<div class="label" '+
 									     'ng-bind="item.label" '+
 									     'ng-click="select(item, true, true)" '+
@@ -646,10 +646,10 @@ angular.module('vd.directive.advanced_select', [])
 	/**
 	 * Directive to make an advanced select with multiple selection
 	 */
-	.directive('advancedSelectMultiple', function($parse, $filter, $timeout) {
+	.directive('vdAdvancedSelectMultiple', function($parse, $filter, $timeout) {
 		return {
 			restrict: 'A',
-			require: 'advancedSelect',
+			require: 'vdAdvancedSelect',
 			replace: true,
 			scope: true,
 			controller: function($scope) {
@@ -845,7 +845,7 @@ angular.module('vd.directive.advanced_select', [])
 			template: 
 			'<div class="advanced-select-container" ng-class="{ \'advanced-select-dropdown-open\': dropDownOpen, \'disabled\': disabled }">'+
 				'<ul class="advanced-select-choices" ng-click="dropDownOpen=(!disabled && !dropDownOpen)">'+
-					'<li advanced-select-option ng-repeat="item in selected">'+
+					'<li vd-advanced-select-option ng-repeat="item in selected">'+
 						'<div ng-bind="item.label"></div>'+
 						'<a href="javascript:void(0)" ng-click="unselect($index, $event)" tabindex="-1"></a>'+
 					'</li>'+
@@ -855,7 +855,7 @@ angular.module('vd.directive.advanced_select', [])
 				'</ul>'+
 				'<div class="advanced-select-drop" ng-show="dropDownOpen">'+
 					'<ul class="results">'+
-						'<li advanced-select-option class="advanced-select-result advanced-select-result-selectable" ng-repeat="item in filteredOptions"  ng-class="{ \'with-children\': item.children.length > 0 }">'+
+						'<li vd-advanced-select-option class="advanced-select-result advanced-select-result-selectable" ng-repeat="item in filteredOptions"  ng-class="{ \'with-children\': item.children.length > 0 }">'+
 							'<div advanced-select-item '+
 							     'class="label" '+
 							     'ng-bind="item.label" '+ 
@@ -863,7 +863,7 @@ angular.module('vd.directive.advanced_select', [])
 							     'ng-mouseover="highlight(item, this)">'+
 							'</div>'+
 							'<ul>'+
-								'<li advanced-select-option class="advanced-select-result" ng-repeat="item in item.children">'+
+								'<li vd-advanced-select-option class="advanced-select-result" ng-repeat="item in item.children">'+
 									'<div class="label" '+
 									     'ng-bind="item.label" '+
 									     'ng-click="select(item, true, true)" '+
@@ -877,7 +877,7 @@ angular.module('vd.directive.advanced_select', [])
 			'</div>'
 		};
 	})
-	.directive('advancedSelectOption', function() {
+	.directive('vdAdvancedSelectOption', function() {
 		return {
 			restrict: 'A',
 			scope: true,
