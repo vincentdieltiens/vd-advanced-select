@@ -3,7 +3,7 @@ AngularJS Advanced-select
 
 Advanced-Select is a set of AngularJS directives to make more powerfull select boxes (Like Select2)
 
-You can see working examples at [http://vincentdieltiens.github.com/advanced-select](http://vincentdieltiens.github.com/advanced-select)
+You can see working examples at [http://vincentdieltiens.github.com/vd-advanced-select](http://vincentdieltiens.github.com/vd-advanced-select)
 
 Why Advanced-select ?
 ---------------------
@@ -15,7 +15,7 @@ Also, I think that's better to write a directive that uses the power of AngularJ
 Example
 -------
 
-You can see working examples at [http://vincentdieltiens.github.com/advanced-select](http://vincentdieltiens.github.com/advanced-select)
+You can see working examples at [http://vincentdieltiens.github.com/vd-advanced-select](http://vincentdieltiens.github.com/vd-advanced-select)
 
 Brower Compatibility
 --------------------
