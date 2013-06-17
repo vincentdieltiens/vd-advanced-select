@@ -10,9 +10,9 @@ angular.module('vd.directive.advanced_select', [])
 				// Creates the Advanced Select using the second directive
 				var el;
 				if (attrs.multiple) {
-					el = angular.element('<vd-advanced-select vd-advanced-select-multiple config="'+attrs.advanced+'" class="'+attrs.class+'" ng-model="'+attrs.ngModel+'" options="'+attrs.ngOptions+'"></advanced-select>');
+					el = angular.element('<vd-advanced-select vd-advanced-select-multiple config="'+attrs.vdAdvanced+'" class="'+attrs.class+'" ng-model="'+attrs.ngModel+'" options="'+attrs.ngOptions+'"></advanced-select>');
 				} else {
-					el = angular.element('<vd-advanced-select vd-advanced-select-simple config="'+attrs.advanced+'" class="'+attrs.class+'" ng-model="'+attrs.ngModel+'" options="'+attrs.ngOptions+'"></advanced-select>');
+					el = angular.element('<vd-advanced-select vd-advanced-select-simple config="'+attrs.vdAdvanced+'" class="'+attrs.class+'" ng-model="'+attrs.ngModel+'" options="'+attrs.ngOptions+'"></advanced-select>');
 				}
 				
 				if (angular.isDefined(attrs.disabled)) {
@@ -29,6 +29,7 @@ angular.module('vd.directive.advanced_select', [])
 				// Hide the select, add the Advanced Select to the DOM and compile it
 				select.css('display', 'none');
 				select.after(el);
+				select.remove();
 				$compile(el)(scope);
 			}
 		};
@@ -278,6 +279,8 @@ angular.module('vd.directive.advanced_select', [])
 				    groupByFn = null,
 				    value=null,
 				    valueFn=null;
+
+
 				
 
 				scope.dropDownElement = element.find('.advanced-select-drop');
@@ -605,6 +608,7 @@ angular.module('vd.directive.advanced_select', [])
 					// Hide the drop down
 					scope.dropDownOpen = false;
 				};
+				element.removeAttr('vd-advanced-select-simple');
 			},
 			replace: true,
 			template: 
@@ -621,7 +625,7 @@ angular.module('vd.directive.advanced_select', [])
 					'</div>'+
 					'<ul class="results">'+
 						'<li vd-advanced-select-option class="advanced-select-result advanced-select-result-selectable" ng-repeat="item in filteredOptions"  ng-class="{ \'with-children\': item.children.length > 0 }">'+
-							'<div advanced-select-item '+
+							'<div '+
 							     'class="label" '+
 							     'ng-bind="item.label" ' + 
 							     'ng-click="select(item, true, true)" '+
@@ -719,6 +723,8 @@ angular.module('vd.directive.advanced_select', [])
 							break;
 					}
 				} 
+
+				element.removeAttr('vd-advanced-select-multiple');
 
 				/**
 				 * check if a value exists in a given array
@@ -856,7 +862,7 @@ angular.module('vd.directive.advanced_select', [])
 				'<div class="advanced-select-drop" ng-show="dropDownOpen">'+
 					'<ul class="results">'+
 						'<li vd-advanced-select-option class="advanced-select-result advanced-select-result-selectable" ng-repeat="item in filteredOptions"  ng-class="{ \'with-children\': item.children.length > 0 }">'+
-							'<div advanced-select-item '+
+							'<div '+
 							     'class="label" '+
 							     'ng-bind="item.label" '+ 
 							     'ng-click="select(item, true, true)" '+
@@ -918,6 +924,8 @@ angular.module('vd.directive.advanced_select', [])
 						label.removeClass('advanced-select-highlighted');
 					}
 				});
+
+				element.removeAttr('vd-advanced-select-option');
 			}
 		};
 	})

@@ -96,6 +96,12 @@ angular.module('app', ['directive.tabs', 'vd.directive.advanced_select', 'ngReso
 	})
 	.factory('Language', function($resource) {
 		return $resource('languages.js/:languageId', {});
+	})
+	.directive('compileOneMoreTime', function($compile) {
+		return function(scope, element) {
+			element.removeAttr('compile-one-more-time');
+			$compile(element)(scope);
+		};
 	});
 
 $(document).ready(function() {
