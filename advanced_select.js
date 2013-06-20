@@ -10,9 +10,9 @@ angular.module('vd.directive.advanced_select', [])
 				// Creates the Advanced Select using the second directive
 				var el;
 				if (attrs.multiple) {
-					el = angular.element('<vd-advanced-select vd-advanced-select-multiple config="'+attrs.vdAdvanced+'" class="'+attrs.class+'" ng-model="'+attrs.ngModel+'" options="'+attrs.ngOptions+'"></advanced-select>');
+					el = angular.element('<vd-advanced-select vd-advanced-select-multiple config="'+attrs.advanced+'" class="'+attrs.class+'" ng-model="'+attrs.ngModel+'" options="'+attrs.ngOptions+'"></vd-advanced-select>');
 				} else {
-					el = angular.element('<vd-advanced-select vd-advanced-select-simple config="'+attrs.vdAdvanced+'" class="'+attrs.class+'" ng-model="'+attrs.ngModel+'" options="'+attrs.ngOptions+'"></advanced-select>');
+					el = angular.element('<vd-advanced-select vd-advanced-select-simple config="'+attrs.advanced+'" class="'+attrs.class+'" ng-model="'+attrs.ngModel+'" options="'+attrs.ngOptions+'"></vd-advanced-select>');
 				}
 				
 				if (angular.isDefined(attrs.disabled)) {
@@ -100,13 +100,26 @@ angular.module('vd.directive.advanced_select', [])
 						return;
 					}
 					// Unhighlight the previous highlighted option, if exists
-					if ($scope.highlighted) {
+					/*if ($scope.highlighted) {
 						$scope.highlighted.highlighted = false;
-					}
+					}*/
+					$scope.unhighlight($scope.highlighted);
 
 					// Highlight the given option
 					option.highlighted = true;
 					$scope.highlighted = option;
+				};
+
+				/**
+				 * Unhighlight the given option
+				 * @param option : the option to highlight
+				 */
+				$scope.unhighlight = function(option) {
+					if (!option) {
+						return;
+					}
+					option.highlighted = false;
+					$scope.highlighted = null;
 				};
 
 				/**
@@ -251,6 +264,10 @@ angular.module('vd.directive.advanced_select', [])
 				 * @param options : the list of options
 				 */
 				$scope.updateSelection = function(ngModel, options) {
+					if (angular.isUndefined(ngModel) || ngModel == null) {
+						$scope.clear(false);
+						return;
+					}
 					var options = angular.isDefined(options) ? options : $scope.getFilteredOptions();
 					for(var i=0, n = options.length; i < n; i++) {
 						var r = options[i];
@@ -416,9 +433,7 @@ angular.module('vd.directive.advanced_select', [])
 				});
 
 				scope.$watch(attrs.ngModel, function(ngModel) {
-					if (ngModel != null) {
-						scope.updateSelection(ngModel, scope.options);
-					}
+					scope.updateSelection(ngModel, scope.options);
 				}, true);
 
 				scope.$watch('search.label', function() {
@@ -608,6 +623,15 @@ angular.module('vd.directive.advanced_select', [])
 					// Hide the drop down
 					scope.dropDownOpen = false;
 				};
+
+				scope.clear = function(updateModel) {
+					scope.unhighlight(scope.selected);
+					scope.selected = null;
+					// Update the model
+					if (angular.isUndefined(updateModel) || updateModel) {
+						scope.setNgModel(scope, option.value);
+					}
+				}
 				element.removeAttr('vd-advanced-select-simple');
 			},
 			replace: true,
@@ -663,6 +687,10 @@ angular.module('vd.directive.advanced_select', [])
 				 * @param options : the list of options
 				 */
 				$scope.updateSelection = function(ngModel, options) {
+					if (angular.isUndefined(ngModel) || ngModel == null || angular.equals(ngModel, []) ) {
+						$scope.clear(false);
+						return;
+					}
 					var options = angular.isDefined(options) ? options : $scope.getFilteredOptions();
 					for(var i=0, n = options.length; i < n; i++) {
 						var r = options[i];
@@ -777,6 +805,19 @@ angular.module('vd.directive.advanced_select', [])
 					
 					// Hide the drop down
 					scope.dropDownOpen = false;
+				};
+
+				scope.clear = function(updateModel) {
+					console.log('Klir')
+					angular.forEach(scope.selected, function(selected) {
+						scope.unhighlight(selected);
+					});
+
+					scope.selected = [];
+
+					if (angular.isUndefined(updateModel) || updateModel) {
+						scope.setNgModel(scope, scope.selected);
+					}
 				};
 
 				/**

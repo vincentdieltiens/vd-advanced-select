@@ -6,6 +6,9 @@ angular.module('app', ['directive.tabs', 'vd.directive.advanced_select', 'ngReso
 			{ id: 1, name: 'Français' }, 
 			{ id: 2, name: 'Italiano' }
 		];
+		$scope.clear = function() {
+			$scope.language = null;
+		}
 	})
 	.controller('example2', function($scope) {
 		$scope.number = 0;
@@ -55,6 +58,9 @@ angular.module('app', ['directive.tabs', 'vd.directive.advanced_select', 'ngReso
 			{ id: 1, name: 'Français' }, 
 			{ id: 2, name: 'Italiano' }
 		];
+		$scope.clear = function() {
+			$scope.selected_languages = [];
+		}
 	})
 	.controller('example8', function($scope) {
 		$scope.person = {};

@@ -30,7 +30,8 @@
 				    vd-advanced>
 				</select>
 				<br /><br />
-				Selected Language Id : {{ language.id }}
+				Selected Language Id : {{ language.id }}<br />
+				<button ng-click="clear()">Clear</button>
 			</div>
 			<div class="code">
 				<h2>Code</h2>
@@ -46,6 +47,8 @@
 	    vd-advanced&gt;
 	&lt;/select&gt;
 &lt;/div&gt;
+
+&lt;button ng-click="clear()"&gt;Clear&lt;/button&gt;
 						</pre>
 					</tab>
 					<tab name="AngularJS">
@@ -346,7 +349,8 @@ app.controller('example6', function($scope, $timeout) {
 		            vd-advanced>
 				</select>
 				<br /><br />
-				Selected languages : {{ selected_languages }}
+				Selected languages : {{ selected_languages }}<br />
+				<button ng-click="clear()">Clear</button>
 			</div>
 			<div class="code">
 				<h2>Code</h2>
@@ -363,6 +367,8 @@ app.controller('example6', function($scope, $timeout) {
 	    vd-advanced&gt;
 	&lt;/select&gt;
 &lt;/div&gt;
+
+&lt;button ng-click="clear()"&gt;Clear&lt;/button&gt;
 						</pre>
 					</tab>
 					<tab name="AngularJS">
