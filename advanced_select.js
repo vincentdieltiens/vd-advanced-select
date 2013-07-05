@@ -618,7 +618,7 @@ angular.module('vd.directive.advanced_select', [])
 
 					// Set the focus
 					if (angular.isDefined(focus) && focus) {
-						element.setFocus();
+						scope.setFocus();
 					}
 					
 					// Update the model
