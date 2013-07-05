@@ -361,7 +361,8 @@ angular.module('vd.directive.advanced_select', [])
 				}
 
 				/* Wachtes and observes */
-				scope.$watch('dropDownOpen', function() {
+				scope.$watch('dropDownOpen', function(newValue, lastDropDownOpen) {
+
 					if (scope.dropDownOpen) {
 						scope.setFilteredOptions();
 
@@ -422,7 +423,10 @@ angular.module('vd.directive.advanced_select', [])
 						scope.dropDownElement.detach();
 						element.append(scope.dropDownElement);
 
-						scope.setFocus();
+						if (lastDropDownOpen) {
+							scope.setFocus();
+						}
+						
 					}
 				});
 
