@@ -421,6 +421,8 @@ angular.module('vd.directive.advanced_select', [])
 
 						scope.dropDownElement.detach();
 						element.append(scope.dropDownElement);
+
+						scope.setFocus();
 					}
 				});
 
@@ -612,7 +614,7 @@ angular.module('vd.directive.advanced_select', [])
 
 					// Set the focus
 					if (angular.isDefined(focus) && focus) {
-						element.find('a').focus();
+						element.setFocus();
 					}
 					
 					// Update the model
@@ -623,6 +625,10 @@ angular.module('vd.directive.advanced_select', [])
 					// Hide the drop down
 					scope.dropDownOpen = false;
 				};
+
+				scope.setFocus = function() {
+					element.find('a').focus();
+				}
 
 				scope.clear = function(updateModel) {
 					scope.unhighlight(scope.selected);
@@ -789,7 +795,7 @@ angular.module('vd.directive.advanced_select', [])
 					
 					// Set the focus
 					if (angular.isDefined(focus) && focus) {
-						element.find('.advanced-select-choices input').focus();
+						scope.setFocus();
 					}
 					
 					// Update the model
@@ -806,6 +812,10 @@ angular.module('vd.directive.advanced_select', [])
 					// Hide the drop down
 					scope.dropDownOpen = false;
 				};
+
+				scope.setFocus = function() {
+					element.find('.advanced-select-choices input').focus();
+				}
 
 				scope.clear = function(updateModel) {
 					console.log('Klir')
