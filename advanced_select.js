@@ -369,6 +369,7 @@ angular.module('vd.directive.advanced_select', [])
 
 						$(document).bind('keydown.advanced_select', handleKeysWhenDropDownOpened)
 						           .bind('mousedown.advanced_select', handleMouseWhenDropDownOpened);
+
 						
 						scope.dropDownElement.detach();
 						$('body').append(scope.dropDownElement);
@@ -635,6 +636,20 @@ angular.module('vd.directive.advanced_select', [])
 				scope.setFocus = function() {
 					element.find('a').focus();
 				}
+
+				element.find('a').bind('focus', function() {
+					$(document).bind('keydown.advanced_select_focus', function(e) {
+						c = ""+String.fromCharCode(e.keyCode);
+						if (c.match(/^[a-zA-Z0-9]$/) == null) {
+							return;
+						}
+						
+						scope.dropDownOpen = true;
+						scope.$apply();
+					});
+				}).bind('blur', function() {
+					$(document).unbind('keydown.advanced_select_focus');
+				});
 
 				scope.clear = function(updateModel) {
 					scope.unhighlight(scope.selected);
