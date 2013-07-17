@@ -10,20 +10,19 @@ angular.module('vd.directive.advanced_select', [])
 				// Creates the Advanced Select using the second directive
 				var el;
 				if (attrs.multiple) {
-					el = angular.element('<vd-advanced-select vd-advanced-select-multiple config="'+attrs.advanced+'" class="'+attrs.class+'" ng-model="'+attrs.ngModel+'" options="'+attrs.ngOptions+'"></vd-advanced-select>');
+					el = angular.element('<vd-advanced-select vd-advanced-select-multiple config="'+attrs.vdAdvanced+'"  options="'+attrs.ngOptions+'"></vd-advanced-select>');
 				} else {
-					el = angular.element('<vd-advanced-select vd-advanced-select-simple config="'+attrs.advanced+'" class="'+attrs.class+'" ng-model="'+attrs.ngModel+'" options="'+attrs.ngOptions+'"></vd-advanced-select>');
+					el = angular.element('<vd-advanced-select vd-advanced-select-simple config="'+attrs.vdAdvanced+'"  options="'+attrs.ngOptions+'"></vd-advanced-select>');
 				}
 				
-				if (angular.isDefined(attrs.disabled)) {
-					el.attr('disabled', attrs.disabled);
-				}
-				if (angular.isDefined(attrs.placeholder)) {
-					el.attr('placeholder', attrs.placeholder);
-				}
+				for(var i=0, n=select[0].attributes.length; i < n; i++) {
+					var attr = select[0].attributes[i];
 
-				if (angular.isDefined(attrs.tabindex)) {
-					el.attr('tabindex', attrs.tabindex);
+					if (attr.name == "name" || attr.name == "ng-options" || attr.name == "vd-advanced") {
+						continue;
+					}
+
+					el.attr(attr.name, attr.nodeValue);
 				}
 
 				// Hide the select, add the Advanced Select to the DOM and compile it
@@ -298,7 +297,9 @@ angular.module('vd.directive.advanced_select', [])
 				    valueFn=null;
 
 
-				
+				element.bind('focus', function() {
+					scope.setFocus();
+				})
 
 				scope.dropDownElement = element.find('.advanced-select-drop');
 				if (attrs.config) {
@@ -328,7 +329,7 @@ angular.module('vd.directive.advanced_select', [])
 				}
 
 				if (attrs.tabindex) {
-					element.attr('tabindex', -1);
+					//element.attr('tabindex', -1);
 					scope.tabIndex = attrs.tabindex;
 				}
 
@@ -623,6 +624,7 @@ angular.module('vd.directive.advanced_select', [])
 					
 					// Update the model
 					if (angular.isUndefined(updateModel) || updateModel) {
+						console.log('set model with val : ', option.value)
 						scope.setNgModel(scope, option.value);
 					}
 
@@ -646,8 +648,8 @@ angular.module('vd.directive.advanced_select', [])
 			},
 			replace: true,
 			template: 
-			'<div class="advanced-select-container" ng-class="{ \'advanced-select-dropdown-open\': dropDownOpen, \'disabled\': disabled }">'+
-				'<a href="javascript:void(0)" ng-click="dropDownOpen=(!disabled && !dropDownOpen)" class="advanced-select-choice" tabindex="tabIndex">'+
+			'<div class="advanced-select-container" ng-class="{ \'advanced-select-dropdown-open\': dropDownOpen, \'disabled\': disabled }" tabindex="-1">'+
+				'<a href="javascript:void(0)" ng-click="dropDownOpen=(!disabled && !dropDownOpen)" class="advanced-select-choice" tabindex="tabIndex+\'a\'">'+
 					'<span ng-bind="selected.label || placeholder" ng-class="{ \'placeholder\': selected == null }"></span>'+
 					'<abbr class="advanced-select-search-choice-close" style="display: none;"></abbr>'+
 					'<div class="arrow"><b></b></div>'+
