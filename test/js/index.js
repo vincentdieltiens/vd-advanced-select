@@ -95,6 +95,19 @@ angular.module('app', ['directive.tabs', 'vd.directive.advanced_select', 'ngReso
 		$scope.language = { id: null };
 		$scope.languages = Language.query();
 	})
+	.controller('example12', function($scope, Language) {
+		$scope.language = { id: null };
+		$scope.languages = Language.query();
+
+		$scope.addLanguage = function(text, select) {
+			var language = new Language();
+			language.id = 185;
+			language.translations = { 'fr-BE': { name: text } };
+			console.log('addLanguage')
+			var i = $scope.languages.push(language);
+			$scope.language = $scope.languages[i-1];
+		}
+	})
 	.filter('namelowercase', function() {
 		return function(object) {
 			return object.name.toLowerCase();

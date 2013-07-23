@@ -638,6 +638,54 @@ app.controller('example10', function($scope) {
 			</div>
 		</div>
 
+		<!--####### EXAMPLE 12 #######-->
+		<div class="example" ng-controller="example12">
+			<div class="result">
+				<h2>Simple List Resource + possibility to add new items</h2>
+				<select id="languages12" ng-model="language.id" 
+				    ng-options="language.id as language.translations['fr-BE'].name for language in languages"
+				    class="languages"
+				    placeholder="select a language"
+				    vd-advanced="{ searchMinChars: 2, searchMinMessage: 'Enter at least two chars', add: 'addLanguage(text, select)'  }">
+				</select>
+				<br /><br />
+				Selected Language Id : {{ language.id }}
+			</div>
+			<div class="code">
+				<h2>Code</h2>
+				<tabs>
+					<tab name="Html">
+						<pre class="prettyprint linenums">
+&lt;div ng-controller="example12"&gt;
+	&lt;select 
+	    ng-model="language.id" 
+	    ng-options="language.id as language.translations['fr-BE'].name for language in languages"
+	    class="languages"
+	    placeholder="select a language"
+	    vd-advanced="{ searchMinChars: 2, searchMinMessage: 'Enter at least two chars' }"&gt;
+	&lt;/select&gt;
+&lt;/div&gt;
+						</pre>
+					</tab>
+					<tab name="AngularJS">
+						<pre class="prettyprint linenums">
+.controller('example12', function($scope, Language) {
+		$scope.language = { id: null };
+		$scope.languages = Language.query();
+	})
+						</pre>
+					</tab>
+					<tab name="CSS">
+						<pre class="prettyprint linenums">
+.languages {
+	width: 200px;
+}
+						</pre>
+					</tab>
+				</tabs>
+			</div>
+		</div>
+
 
 	</body>
 </html>

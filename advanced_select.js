@@ -75,6 +75,7 @@ angular.module('vd.directive.advanced_select', [])
 
 				$scope.setFilteredOptions = function() {
 					if ($scope.config == null || $scope.search.label.length >= $scope.config.searchMinChars) {
+						console.log('iciiiii')
 						$scope.filteredOptions = $filter('filter')($scope.options, $scope.search);
 					} else {
 						$scope.filteredOptions = [];
@@ -307,6 +308,10 @@ angular.module('vd.directive.advanced_select', [])
 					if (typeof(scope.config) == 'string') {
 						scope.config = $parse('$parent.'+config)();
 					}
+
+					if (scope.config.add) {
+						scope.config.add = $parse(scope.config.add);
+					}
 				}
 
 				if (attrs.options) {
@@ -365,6 +370,7 @@ angular.module('vd.directive.advanced_select', [])
 				scope.$watch('dropDownOpen', function(newValue, lastDropDownOpen) {
 
 					if (scope.dropDownOpen) {
+						console.log('dropdown...')
 						scope.setFilteredOptions();
 
 						$(document).bind('keydown.advanced_select', handleKeysWhenDropDownOpened)
@@ -615,6 +621,26 @@ angular.module('vd.directive.advanced_select', [])
 				 * @param focus : if the method must set the focus on the select
 				 */
 				scope.select = function(option, updateModel, focus) {
+					if (option == null) {
+
+						if (scope.config.add) {
+							scope.config.add(scope, { 
+								text: scope.search.label,
+								close: function() {
+									console.log('clooooooose')
+									scope.dropDownOpen = false;
+									scope.$apply();
+								},
+								select: function(option, updateModel, focus) {
+									scope.select(option, updateModel, focus);
+									scope.$apply();
+								}
+							});
+						}
+
+						return;
+					}
+
 					scope.selected = option;
 					scope.highlight(option);
 
