@@ -75,10 +75,9 @@ angular.module('vd.directive.advanced_select', [])
 
 				$scope.setFilteredOptions = function() {
 					if ($scope.config == null || $scope.search.label.length >= $scope.config.searchMinChars) {
-						console.log('iciiiii')
 						$scope.filteredOptions = $filter('filter')($scope.options, $scope.search);
 					} else {
-						$scope.filteredOptions = [];
+						$scope.filteredOptions = $filter('filter')($scope.options, $scope.search);
 					}
 				}
 
@@ -280,6 +279,10 @@ angular.module('vd.directive.advanced_select', [])
 						}
 					}
 				};
+
+				this.setConfig = function(key, value) {
+					scope.config[key] = value;
+				}
 			}],
 			link: function(scope, element, attrs) {
 				// ngModel
@@ -295,7 +298,8 @@ angular.module('vd.directive.advanced_select', [])
 				    groupBy = null,
 				    groupByFn = null,
 				    value=null,
-				    valueFn=null;
+				    valueFn=null,
+				    watchOptionsModelExpression = null;
 
 
 				element.bind('focus', function() {
@@ -312,6 +316,8 @@ angular.module('vd.directive.advanced_select', [])
 					if (scope.config.add) {
 						scope.config.add = $parse(scope.config.add);
 					}
+				} else {
+					scope.config = {};
 				}
 
 				if (attrs.options) {
@@ -326,8 +332,12 @@ angular.module('vd.directive.advanced_select', [])
 					    //
 					    groupBy = match[3] ? match[3].replace(new RegExp('^'+item), 'item') : null,
 					    groupByFn = $parse(groupBy),
-					    optionsModel = match[7];
+					    optionsModel = match[7],
+					    watchOptionsModelExpression = scope.config.watch || optionsModel,
+					    watchOptionsModelEquality = scope.config.watchEquality || true;
 					
+					scope.optionsModel = optionsModel;
+
 					fillInResultsFromNgOptions();
 				} else {
 					fillInResultsFromSelect();
@@ -370,7 +380,6 @@ angular.module('vd.directive.advanced_select', [])
 				scope.$watch('dropDownOpen', function(newValue, lastDropDownOpen) {
 
 					if (scope.dropDownOpen) {
-						console.log('dropdown...')
 						scope.setFilteredOptions();
 
 						$(document).bind('keydown.advanced_select', handleKeysWhenDropDownOpened)
@@ -391,6 +400,10 @@ angular.module('vd.directive.advanced_select', [])
 								'position': 'absolute',
 								'width': element.outerWidth()
 							});
+
+							if (scope.config && scope.config.zIndex) {
+								scope.dropDownElement.css('z-index', scope.config.zIndex);
+							}
 
 							scope.adjustDropDownPosition();
 							
@@ -536,7 +549,10 @@ angular.module('vd.directive.advanced_select', [])
 				 *   - children (optional) : an array of sub options 
 				 */
 				function fillInResultsFromNgOptions() {
-					scope.$watch(optionsModel, function(items) {
+					var getOptionsModel = $parse(optionsModel);
+
+					scope.$watch(watchOptionsModelExpression, function() {
+						var items = getOptionsModel(scope);
 						if (groupBy != null) {
 							scope.options = [];
 							var groups = {};
@@ -578,13 +594,13 @@ angular.module('vd.directive.advanced_select', [])
 							
 						}
 
-						//scope.setFilteredOptions();
+						scope.setFilteredOptions();
 						
 						if ((modelValue = getNgModel(scope)) != null) {
 							scope.updateSelection(modelValue, scope.options);
 						}
 						
-					}, true);
+					}, watchOptionsModelEquality);
 				}
 
 				/**
@@ -621,13 +637,11 @@ angular.module('vd.directive.advanced_select', [])
 				 * @param focus : if the method must set the focus on the select
 				 */
 				scope.select = function(option, updateModel, focus) {
-					if (option == null) {
-
-						if (scope.config.add) {
+					if (scope.filteredOptions.length == 0) {
+						if (scope.config && scope.config.add) {
 							scope.config.add(scope, { 
 								text: scope.search.label,
 								close: function() {
-									console.log('clooooooose')
 									scope.dropDownOpen = false;
 									scope.$apply();
 								},
@@ -651,7 +665,6 @@ angular.module('vd.directive.advanced_select', [])
 					
 					// Update the model
 					if (angular.isUndefined(updateModel) || updateModel) {
-						console.log('set model with val : ', option.value)
 						scope.setNgModel(scope, option.value);
 					}
 
@@ -865,7 +878,6 @@ angular.module('vd.directive.advanced_select', [])
 				}
 
 				scope.clear = function(updateModel) {
-					console.log('Klir')
 					angular.forEach(scope.selected, function(selected) {
 						scope.unhighlight(selected);
 					});
