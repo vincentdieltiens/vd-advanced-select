@@ -10,11 +10,11 @@ angular.module('vd.directive.advanced_select', [])
 				// Creates the Advanced Select using the second directive
 				var el;
 				if (attrs.multiple) {
-					el = angular.element('<vd-advanced-select vd-advanced-select-multiple config="'+attrs.vdAdvanced+'"  options="'+attrs.ngOptions+'"></vd-advanced-select>');
+					el = angular.element('<vd-advanced-select vd-advanced-select-multiple options="'+attrs.ngOptions+'"></vd-advanced-select>');
 				} else {
-					el = angular.element('<vd-advanced-select vd-advanced-select-simple config="'+attrs.vdAdvanced+'"  options="'+attrs.ngOptions+'"></vd-advanced-select>');
+					el = angular.element('<vd-advanced-select vd-advanced-select-simple options="'+attrs.ngOptions+'"></vd-advanced-select>');
 				}
-				
+
 				for(var i=0, n=select[0].attributes.length; i < n; i++) {
 					var attr = select[0].attributes[i];
 
@@ -22,13 +22,14 @@ angular.module('vd.directive.advanced_select', [])
 						continue;
 					}
 
-					el.attr(attr.name, attr.nodeValue);
+					el.attr(attr.name, attr.value);
 				}
+				el.attr('config', attrs.vdAdvanced)
 
 				// Hide the select, add the Advanced Select to the DOM and compile it
 				select.css('display', 'none');
 				select.after(el);
-				select.remove();
+				//select.remove();
 				$compile(el)(scope);
 			}
 		};
@@ -74,10 +75,14 @@ angular.module('vd.directive.advanced_select', [])
 				$scope.dropDownIsOnTop = false;
 
 				$scope.setFilteredOptions = function() {
-					if ($scope.config == null || $scope.search.label.length >= $scope.config.searchMinChars) {
+					if ($scope.config == null || angular.isUndefined($scope.config.searchMinChars) || $scope.search.label.length >= $scope.config.searchMinChars) {
 						$scope.filteredOptions = $filter('filter')($scope.options, $scope.search);
+						console.log('setFilteredOptions : ', $scope.highlighted)
+						if (!$scope.hasHighlighted()) {
+							$scope.highlightFirst();
+						}
 					} else {
-						$scope.filteredOptions = $filter('filter')($scope.options, $scope.search);
+						$scope.filteredOptions = [];
 					}
 				}
 
@@ -262,20 +267,22 @@ angular.module('vd.directive.advanced_select', [])
 				 * @param ngModel : the model to use to update the label
 				 * @param options : the list of options
 				 */
-				$scope.updateSelection = function(ngModel, options) {
+				$scope.updateSelection = function(ngModel, options, canAdd) {
 					if (angular.isUndefined(ngModel) || ngModel == null) {
 						$scope.clear(false);
 						return;
 					}
 					var options = angular.isDefined(options) ? options : $scope.getFilteredOptions();
+					
 					for(var i=0, n = options.length; i < n; i++) {
 						var r = options[i];
-						if (r.value == ngModel) {
-							$scope.select(r, false, false);
+						console.log('equals : ', r.value, ngModel);
+						if (angular.equals(r.value, ngModel)) {
+							$scope.select(r, false, false, canAdd);
 							return;
 						}
 						if (r.children) {
-							$scope.updateSelection(ngModel, r.children);
+							$scope.updateSelection(ngModel, r.children, canAdd);
 						}
 					}
 				};
@@ -307,7 +314,8 @@ angular.module('vd.directive.advanced_select', [])
 				})
 
 				scope.dropDownElement = element.find('.advanced-select-drop');
-				if (attrs.config) {
+				
+				if (attrs.config && attrs.config != '') {
 					scope.config = scope.$eval(attrs.config);
 					if (typeof(scope.config) == 'string') {
 						scope.config = $parse('$parent.'+config)();
@@ -333,8 +341,8 @@ angular.module('vd.directive.advanced_select', [])
 					    groupBy = match[3] ? match[3].replace(new RegExp('^'+item), 'item') : null,
 					    groupByFn = $parse(groupBy),
 					    optionsModel = match[7],
-					    watchOptionsModelExpression = scope.config.watch || optionsModel,
-					    watchOptionsModelEquality = scope.config.watchEquality || true;
+					    watchOptionsModelExpression = scope.config.watchOptions ? scope.config.watchOptions : optionsModel,
+					    watchOptionsModelEquality = scope.config.watchOptionsEquality || true;
 					
 					scope.optionsModel = optionsModel;
 
@@ -427,11 +435,6 @@ angular.module('vd.directive.advanced_select', [])
 
 						scope.DropDownOpened();
 
-
-						if (!scope.hasHighlighted()) {
-							scope.highlightFirst();
-						}
-
 						if (scope.highlighted && scope.highlighted.makeVisible) {
 							scope.highlighted.makeVisible('middle');
 						}
@@ -460,7 +463,7 @@ angular.module('vd.directive.advanced_select', [])
 				});
 
 				scope.$watch(attrs.ngModel, function(ngModel) {
-					scope.updateSelection(ngModel, scope.options);
+					scope.updateSelection(ngModel, scope.options, false);
 				}, true);
 
 				scope.$watch('search.label', function() {
@@ -507,10 +510,13 @@ angular.module('vd.directive.advanced_select', [])
 				function handleKeysWhenDropDownOpened(e) {
 					switch(e.keyCode) {
 						case 9: // Tab
+							scope.select(scope.highlighted, true, true, true);
+							scope.$apply();
+							break;
 						case 13: // Enter
 							e.preventDefault();
 							e.stopPropagation();
-							scope.select(scope.highlighted, true, true);
+							scope.select(scope.highlighted, true, true, true);
 							scope.$apply();
 							break;
 						case 27: // Escape
@@ -550,7 +556,6 @@ angular.module('vd.directive.advanced_select', [])
 				 */
 				function fillInResultsFromNgOptions() {
 					var getOptionsModel = $parse(optionsModel);
-
 					scope.$watch(watchOptionsModelExpression, function() {
 						var items = getOptionsModel(scope);
 						if (groupBy != null) {
@@ -597,7 +602,7 @@ angular.module('vd.directive.advanced_select', [])
 						scope.setFilteredOptions();
 						
 						if ((modelValue = getNgModel(scope)) != null) {
-							scope.updateSelection(modelValue, scope.options);
+							scope.updateSelection(modelValue, scope.options, false);
 						}
 						
 					}, watchOptionsModelEquality);
@@ -636,8 +641,9 @@ angular.module('vd.directive.advanced_select', [])
 				 * @param updateModel : if the method must update the model
 				 * @param focus : if the method must set the focus on the select
 				 */
-				scope.select = function(option, updateModel, focus) {
-					if (scope.filteredOptions.length == 0) {
+				scope.select = function(option, updateModel, focus, canAdd) {
+					var canAdd = angular.isDefined(canAdd) ? canAdd : true;
+					if (scope.filteredOptions.length == 0 && canAdd) {
 						if (scope.config && scope.config.add) {
 							scope.config.add(scope, { 
 								text: scope.search.label,
@@ -646,7 +652,7 @@ angular.module('vd.directive.advanced_select', [])
 									scope.$apply();
 								},
 								select: function(option, updateModel, focus) {
-									scope.select(option, updateModel, focus);
+									scope.select(option, updateModel, focus, canAdd);
 									scope.$apply();
 								}
 							});
@@ -752,7 +758,7 @@ angular.module('vd.directive.advanced_select', [])
 				 * @param ngModel : the model to use to update the label
 				 * @param options : the list of options
 				 */
-				$scope.updateSelection = function(ngModel, options) {
+				$scope.updateSelection = function(ngModel, options, canAdd) {
 					if (angular.isUndefined(ngModel) || ngModel == null || angular.equals(ngModel, []) ) {
 						$scope.clear(false);
 						return;
@@ -762,11 +768,11 @@ angular.module('vd.directive.advanced_select', [])
 						var r = options[i];
 						for(var j=0, m=ngModel.length; j < m; j++) {
 							if (r.value == ngModel[j]) {
-								$scope.select(r, false, false);
+								$scope.select(r, false, false, canAdd);
 							}
 						}
 						if (r.children) {
-							$scope.updateSelection(ngModel, r.children);
+							$scope.updateSelection(ngModel, r.children, canAdd);
 						}
 					}
 				};
