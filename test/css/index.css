@@ -1,0 +1,9 @@
+html,body{font-family:Arial;font-size:12px;}
+label{line-height:24px;}
+.languages{width:200px;}
+.numbers{width:100px;}
+.countries{width:200px;}
+.example{display:table-row;}.example .result{display:table-cell;width:400px;}
+.example .code{display:table-cell;width:400px;}
+.tabbable{min-width:300px;height:300px;}.tabbable .tab-content{overflow:auto;}
+.box{border:1px solid #ccc;background-color:#eee;width:200px;height:50px;overflow:hidden;}
